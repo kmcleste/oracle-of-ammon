@@ -7,13 +7,13 @@ from rich.logging import RichHandler
 logger = logging.getLogger(__name__)
 logger.propagate = False
 
-if not pathlib.Path(os.getcwd(), "search_cli", "logs").exists():
-    os.mkdir(path=pathlib.Path(os.getcwd(), "search_cli", "logs"))
+if not pathlib.Path(os.getcwd(), "oracle_of_ammon", "logs").exists():
+    os.mkdir(path=pathlib.Path(os.getcwd(), "oracle_of_ammon", "logs"))
 
 # the handler determines where the logs go: stdout/file
 shell_handler = RichHandler()
 file_handler = logging.FileHandler(
-    pathlib.Path(os.getcwd(), "search_cli", "logs", "debug.log")
+    pathlib.Path(os.getcwd(), "oracle_of_ammon", "logs", "debug.log")
 )
 
 logger.setLevel(logging.DEBUG)

@@ -6,7 +6,7 @@ from typing import Union
 
 import typer
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "search_cli", "common")))
+sys.path.append(str(pathlib.Path(os.getcwd(), "oracle_of_ammon", "common")))
 from logger import logger
 
 app = typer.Typer(help="Oracle of Ammon")
@@ -27,8 +27,6 @@ def run(
         os.environ["OASIS_OF_SIWA"] = path
 
     logger.debug("Summoning Ammon 🔮")
-    subprocess.call("search_cli/api/Ammon.py", env=os.environ, shell=False)  # nosec
-
-
-if __name__ == "__main__":
-    app()
+    subprocess.call(  # nosec
+        "oracle_of_ammon/api/Ammon.py", env=os.environ, shell=False  # nosec
+    )

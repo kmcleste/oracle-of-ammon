@@ -10,7 +10,7 @@ from haystack.nodes import EmbeddingRetriever
 from haystack.pipelines import FAQPipeline
 import pandas as pd
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "search_cli", "common")))
+sys.path.append(str(pathlib.Path(os.getcwd(), "oracle_of_ammon", "common")))
 from logger import logger
 
 

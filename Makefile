@@ -7,7 +7,7 @@ black:
 	poetry run black .
 
 bandit:
-	poetry run bandit -c pyproject.toml -r search_cli/
+	poetry run bandit -c pyproject.toml -r oracle_of_ammon/
 
 test:
 	poetry run pytest
@@ -15,4 +15,4 @@ test:
 cicd: black bandit test
 
 oracle:
-	poetry run python search_cli/cli/main.py
+	poetry run python oracle_of_ammon/cli/main.py

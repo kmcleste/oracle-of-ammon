@@ -21,7 +21,7 @@ from models import (
     Documents,
 )
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "search_cli", "common")))
+sys.path.append(str(pathlib.Path(os.getcwd(), "oracle_of_ammon", "common")))
 from logger import logger
 
 

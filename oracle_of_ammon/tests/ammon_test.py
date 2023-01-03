@@ -5,7 +5,7 @@ import sys
 from fastapi.testclient import TestClient
 from pydantic import parse_obj_as
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "search_cli", "api")))
+sys.path.append(str(pathlib.Path(os.getcwd(), "oracle_of_ammon", "api")))
 from ammon import app
 from models import HealthResponse, Documents, HTTPError, SearchResponse, Summary
 
@@ -49,7 +49,7 @@ def test_search():
 
 def test_upload():
     file = open(
-        file=pathlib.Path(os.getcwd(), "search_cli", "data", "test.csv"), mode="br"
+        file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "test.csv"), mode="br"
     )
     response = client.post("/upload-documents", files={"files": file})
     assert response.status_code == 201

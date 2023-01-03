@@ -1,6 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "./search_cli/api",
-        "./search_cli/common"
+        "./oracle_of_ammon/api",
+        "./oracle_of_ammon/common"
     ]
 }

@@ -1,11 +1,19 @@
 [tool.poetry]
-name = "trex-arms-faq"
+name = "oracle-of-ammon"
 version = "0.1.0"
-description = ""
-authors = ["Kyle McLester <kmcleste@uncc.edu>"]
+description = "A simple api generator for question:answer pairs."
+authors = ["Kyle McLester <kyle.mclester@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "search_cli"}]
+homepage = "https://github.com/kmcleste/oracle-of-ammon"
+repository = "https://github.com/kmcleste/oracle-of-ammon"
+keywords = ["fastapi", "haystack", "search", "faq", "typer"]
+include = ["LICENSE"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+packages = [{include = "oracle_of_ammon"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
@@ -30,6 +38,9 @@ ipykernel = "^6.19.4"
 ipywidgets = "^8.0.4"
 httpx = "^0.23.1"
 bandit = {extras = ["toml"], version = "^1.7.4"}
+
+[tool.poetry.scripts]
+oracle-of-ammon = "oracle_of_ammon.cli.main:app"
 
 [build-system]
 requires = ["poetry-core"]
