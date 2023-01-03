@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./search_cli/api",
+        "./search_cli/common"
+    ]
+}
