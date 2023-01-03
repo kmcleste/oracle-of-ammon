@@ -18,7 +18,6 @@ class Oracle:
     def __init__(self, index: str = "document"):
         self.index = index
         self.use_gpu: bool = False
-        self.data_path = pathlib.Path(os.getcwd(), "search_cli", "data")
         self.document_store = self.create_document_store()
         self.retriever = self.create_retriever()
         self.pipeline = FAQPipeline(retriever=self.retriever)

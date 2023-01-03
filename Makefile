@@ -7,7 +7,7 @@ black:
 	poetry run black .
 
 bandit:
-	poetry run bandit -c pyproject.toml -r src/
+	poetry run bandit -c pyproject.toml -r search_cli/
 
 test:
 	poetry run pytest

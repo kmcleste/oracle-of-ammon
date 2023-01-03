@@ -3,3 +3,4 @@ __pycache__
 .DS_store
 logs/
 .pytest_cache
+*.ipynb

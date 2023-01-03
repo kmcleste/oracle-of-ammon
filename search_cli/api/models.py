@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from haystack import Answer
+from haystack import Answer, Document
 from pydantic import BaseModel, Field, validator
 
 
@@ -19,11 +19,15 @@ class SearchResponse(BaseModel):
     )
 
 
+class Documents(BaseModel):
+    documents: List[Document]
+
+
 class UploadedDocuments(BaseModel):
     message: str = Field(..., description="Status of file upload")
 
 
-class Describe(BaseModel):
+class Summary(BaseModel):
     count: int = Field(..., description="Count of documents in an index")
     chars_mean: float = Field(
         ..., description="Mean characters across all documents in an index"

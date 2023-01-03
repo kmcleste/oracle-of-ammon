@@ -7,7 +7,6 @@ from typing import List
 
 from fastapi import FastAPI, status, UploadFile, File, HTTPException
 from fastapi.responses import HTMLResponse
-from haystack import Document
 import uvicorn
 
 from oracle import Oracle
@@ -17,8 +16,9 @@ from models import (
     SearchResponse,
     HealthResponse,
     UploadedDocuments,
-    Describe,
+    Summary,
     HTTPError,
+    Documents,
 )
 
 sys.path.append(str(pathlib.Path(os.getcwd(), "search_cli", "common")))
@@ -121,12 +121,14 @@ def health():
     path="/get-documents",
     status_code=status.HTTP_200_OK,
     tags=["documents"],
-    response_model=List[Document],
+    response_model=Documents,
 )
 def get_documents():
-    return oracle.document_store.get_all_documents(
-        index=oracle.index, return_embedding=False
-    )
+    return {
+        "documents": oracle.document_store.get_all_documents(
+            index=oracle.index, return_embedding=False
+        )
+    }
 
 
 @app.post(
@@ -146,7 +148,7 @@ def upload_documents(
     status_code=status.HTTP_200_OK,
     tags=["documents"],
     responses={
-        200: {"model": Describe},
+        200: {"model": Summary},
         404: {
             "model": HTTPError,
             "description": "Returned when document store is empty.",
