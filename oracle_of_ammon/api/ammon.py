@@ -21,7 +21,13 @@ from models import (
     Documents,
 )
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "oracle_of_ammon", "common")))
+sys.path.append(
+    str(
+        pathlib.Path(
+            pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent, "common"
+        )
+    )
+)
 from logger import logger
 
 

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "oracle-of-ammon"
 version = "0.1.0"
-description = "A simple api generator for question:answer pairs."
+description = "CLI tool for creating Search APIs."
 authors = ["Kyle McLester <kyle.mclester@gmail.com>"]
 license = "MIT"
 readme = "README.md"
@@ -21,11 +21,11 @@ requests = "^2.28.1"
 uvicorn = "^0.20.0"
 pandas = "^1.5.2"
 fastapi = "^0.88.0"
-farm-haystack = {git = "https://github.com/deepset-ai/haystack.git", rev = "main", extras = ["preprocessing ocr docstores"], develop = true}
 pynvml = "^11.4.1"
 typer = {extras = ["all"], version = "^0.7.0"}
 aiofiles = "^22.1.0"
 python-multipart = "^0.0.5"
+farm-haystack = "^1.12.2"
 
 
 [tool.poetry.group.dev.dependencies]

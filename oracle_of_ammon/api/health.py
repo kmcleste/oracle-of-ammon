@@ -9,7 +9,13 @@ import haystack
 
 from models import CPUUsage, MemoryUsage, GPUUsage, GPUInfo
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "src", "common")))
+sys.path.append(
+    str(
+        pathlib.Path(
+            pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent, "common"
+        )
+    )
+)
 from logger import logger
 
 
