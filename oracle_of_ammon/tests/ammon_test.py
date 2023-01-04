@@ -1,13 +1,17 @@
 import os
 import pathlib
-import sys
 
 from fastapi.testclient import TestClient
 from pydantic import parse_obj_as
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "oracle_of_ammon", "api")))
-from ammon import app
-from models import HealthResponse, Documents, HTTPError, SearchResponse, Summary
+from oracle_of_ammon.api.ammon import app
+from oracle_of_ammon.api.models import (
+    HealthResponse,
+    Documents,
+    HTTPError,
+    SearchResponse,
+    Summary,
+)
 
 client = TestClient(app)
 

@@ -1,6 +1,5 @@
 from io import BytesIO
 import os
-import pathlib
 import sys
 
 from fastapi import UploadFile
@@ -10,14 +9,7 @@ from haystack.nodes import EmbeddingRetriever
 from haystack.pipelines import FAQPipeline
 import pandas as pd
 
-sys.path.append(
-    str(
-        pathlib.Path(
-            pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent, "common"
-        )
-    )
-)
-from logger import logger
+from oracle_of_ammon.common.logger import logger
 
 
 class Oracle:

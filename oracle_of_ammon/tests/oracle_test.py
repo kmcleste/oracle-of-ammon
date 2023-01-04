@@ -1,9 +1,7 @@
 import os
 import pathlib
-import sys
 
-sys.path.append(str(pathlib.Path(os.getcwd(), "oracle_of_ammon", "api")))
-from oracle import Oracle
+from oracle_of_ammon.api.oracle import Oracle
 
 oracle = Oracle()
 

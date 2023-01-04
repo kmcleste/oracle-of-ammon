@@ -1,22 +1,13 @@
 import os
-import pathlib
 import pynvml
 import psutil
-import sys
 from typing import List
 
 import haystack
 
-from models import CPUUsage, MemoryUsage, GPUUsage, GPUInfo
+from oracle_of_ammon.api.models import CPUUsage, MemoryUsage, GPUUsage, GPUInfo
 
-sys.path.append(
-    str(
-        pathlib.Path(
-            pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent, "common"
-        )
-    )
-)
-from logger import logger
+from oracle_of_ammon.common.logger import logger
 
 
 def get_health_status():

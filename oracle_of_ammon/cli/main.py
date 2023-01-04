@@ -1,19 +1,10 @@
 import os
-import pathlib
 import subprocess  # nosec
-import sys
 from typing import Union
 
 import typer
 
-sys.path.append(
-    str(
-        pathlib.Path(
-            pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent, "common"
-        )
-    )
-)
-from logger import logger
+from oracle_of_ammon.common.logger import logger
 
 app = typer.Typer(help="Oracle of Ammon")
 
@@ -34,5 +25,7 @@ def run(
 
     logger.debug("Summoning Ammon 🔮")
     subprocess.call(  # nosec
-        "oracle_of_ammon/api/Ammon.py", env=os.environ, shell=False  # nosec
+        ["python3", "-m", "oracle_of_ammon.api.ammon"],
+        env=os.environ,
+        shell=False,  # nosec
     )

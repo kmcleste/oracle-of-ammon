@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 
-import os
-import pathlib
-import sys
 from typing import List
 
 from fastapi import FastAPI, status, UploadFile, File, HTTPException
 from fastapi.responses import HTMLResponse
 import uvicorn
 
-from oracle import Oracle
-from health import get_health_status
-from models import (
+from oracle_of_ammon.api.oracle import Oracle
+from oracle_of_ammon.api.health import get_health_status
+from oracle_of_ammon.api.models import (
     Query,
     SearchResponse,
     HealthResponse,
@@ -20,15 +17,7 @@ from models import (
     HTTPError,
     Documents,
 )
-
-sys.path.append(
-    str(
-        pathlib.Path(
-            pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent, "common"
-        )
-    )
-)
-from logger import logger
+from oracle_of_ammon.common.logger import logger
 
 
 app = FastAPI(title="Oracle of Ammon", version="0.1.0")
