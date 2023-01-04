@@ -1,3 +1,3 @@
 # Oracle of Ammon
 
-A simple CLI tool for build Search APIs.
+A simple CLI tool for creating Search APIs.
