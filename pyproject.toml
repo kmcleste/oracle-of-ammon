@@ -38,6 +38,7 @@ ipykernel = "^6.19.4"
 ipywidgets = "^8.0.4"
 httpx = "^0.23.1"
 bandit = {extras = ["toml"], version = "^1.7.4"}
+locust = "^2.14.0"
 
 [tool.poetry.scripts]
 oracle-of-ammon = "oracle_of_ammon.cli.main:app"

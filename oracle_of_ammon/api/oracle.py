@@ -33,6 +33,7 @@ class Oracle:
                 embedding_dim=384,
                 duplicate_documents="skip",
                 similarity="cosine",
+                progress_bar=False,
             )
         except Exception as e:
             logger.error(f"Unable to create document store: {e}")
@@ -45,6 +46,7 @@ class Oracle:
                 document_store=self.document_store,
                 use_gpu=self.use_gpu,
                 scale_score=False,
+                progress_bar=False,
             )
         except Exception as e:
             logger.error(f"Unable to create retriever: {e}")
