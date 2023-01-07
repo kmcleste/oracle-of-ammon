@@ -42,6 +42,6 @@ Documents must explicitly be CSV's in the form of question:answer pairs. An exam
 
 ### Locust
 
-[Locust](https://locust.io/) is an open source tool for load testing. You're able to swarm your system with millions of simultaneous users -- recording service performance and other metrics. By default, Locust will start on port 8089. To start a new load test, simply enter the numbder of users you want to simulate, their spawn rate, and the host address to swarm.
+[Locust](https://locust.io/) is an open source tool for load testing. You're able to swarm your system with millions of simultaneous users -- recording service performance and other metrics. By default, Locust will start on port 8089. To start a new load test, simply enter the number of users you want to simulate, their spawn rate, and the host address to swarm.
 
 [![Image of locust config](image/../images/locust-config.png)](https://locust.io)]

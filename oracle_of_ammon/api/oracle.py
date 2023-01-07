@@ -10,6 +10,7 @@ from haystack.nodes import EmbeddingRetriever
 from haystack.pipelines import FAQPipeline
 import pandas as pd
 
+from oracle_of_ammon.api.utils.filehandler import FileHandler
 from oracle_of_ammon.utils.logger import configure_logger
 
 logger: logging.Logger = configure_logger()
