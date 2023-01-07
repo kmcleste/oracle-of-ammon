@@ -1,4 +1,5 @@
 from io import BytesIO
+import logging
 import os
 import sys
 
@@ -9,16 +10,18 @@ from haystack.nodes import EmbeddingRetriever
 from haystack.pipelines import FAQPipeline
 import pandas as pd
 
-from oracle_of_ammon.common.logger import logger
+from oracle_of_ammon.utils.logger import configure_logger
+
+logger: logging.Logger = configure_logger()
 
 
 class Oracle:
     def __init__(self, index: str = "document"):
-        self.index = index
+        self.index: str = index
         self.use_gpu: bool = False
-        self.document_store = self.create_document_store()
-        self.retriever = self.create_retriever()
-        self.pipeline = FAQPipeline(retriever=self.retriever)
+        self.document_store: InMemoryDocumentStore = self.create_document_store()
+        self.retriever: EmbeddingRetriever = self.create_retriever()
+        self.pipeline: FAQPipeline = FAQPipeline(retriever=self.retriever)
 
         self.initialize_document_store()
 
@@ -70,6 +73,7 @@ class Oracle:
         except Exception as e:
             logger.warning(f"Unable to write documents to document store: {e}")
 
+    # TODO: Add excel, text, tsv, json, squad support
     def upload_documents(self, files: list[UploadFile]) -> dict:
         for file in files:
             try:

@@ -861,6 +861,18 @@ files = [
 ]
 
 [[package]]
+name = "et-xmlfile"
+version = "1.1.0"
+description = "An implementation of lxml.xmlfile for the standard library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "et_xmlfile-1.1.0-py3-none-any.whl", hash = "sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada"},
+    {file = "et_xmlfile-1.1.0.tar.gz", hash = "sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c"},
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.1.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -2792,6 +2804,21 @@ files = [
 rsa = ["cryptography (>=3.0.0)"]
 signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
+
+[[package]]
+name = "openpyxl"
+version = "3.0.10"
+description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "openpyxl-3.0.10-py2.py3-none-any.whl", hash = "sha256:0ab6d25d01799f97a9464630abacbb34aafecdcaa0ef3cba6d6b3499867d0355"},
+    {file = "openpyxl-3.0.10.tar.gz", hash = "sha256:e47805627aebcf860edb4edf7987b1309c1b3632f3750538ed962bbcc3bd7449"},
+]
+
+[package.dependencies]
+et-xmlfile = "*"
 
 [[package]]
 name = "packaging"
@@ -5051,4 +5078,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.11"
-content-hash = "e22e82e2cf08606c0fb07329bb10e7c55c2c2f709ca1164ae033e3f193efe2aa"
+content-hash = "054bb68de3cabbe1173b9e10e363e1e2f214c3f8a0edf1c866f4de64e533d2bb"

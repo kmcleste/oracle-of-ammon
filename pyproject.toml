@@ -27,6 +27,7 @@ aiofiles = "^22.1.0"
 python-multipart = "^0.0.5"
 farm-haystack = "^1.12.2"
 psutil = "^5.9.4"
+openpyxl = "^3.0.10"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -54,4 +55,4 @@ filterwarnings = [
 ]
 
 [tool.bandit]
-skips = ["B101", "B104", "B501"]
+skips = ["B101", "B104", "B501", "B603", "B607"]

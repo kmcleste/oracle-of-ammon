@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import List
+import logging
 
 from fastapi import FastAPI, status, UploadFile, File, HTTPException
 from fastapi.responses import HTMLResponse
@@ -17,7 +17,9 @@ from oracle_of_ammon.api.models import (
     HTTPError,
     Documents,
 )
-from oracle_of_ammon.common.logger import logger
+from oracle_of_ammon.utils.logger import configure_logger
+
+logger: logging.Logger = configure_logger()
 
 
 app = FastAPI(title="Oracle of Ammon", version="0.1.0")

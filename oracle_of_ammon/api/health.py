@@ -1,3 +1,4 @@
+import logging
 import os
 import pynvml
 import psutil
@@ -7,7 +8,9 @@ import haystack
 
 from oracle_of_ammon.api.models import CPUUsage, MemoryUsage, GPUUsage, GPUInfo
 
-from oracle_of_ammon.common.logger import logger
+from oracle_of_ammon.utils.logger import configure_logger
+
+logger: logging.Logger = configure_logger()
 
 
 def get_health_status():

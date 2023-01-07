@@ -1,7 +1,0 @@
-{
-    "python.analysis.extraPaths": [
-        "./oracle_of_ammon/api",
-        "./oracle_of_ammon/common"
-    ],
-    "git.ignoreLimitWarning": true
-}
