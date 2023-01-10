@@ -23,7 +23,7 @@ from oracle_of_ammon.utils.logger import configure_logger
 logger: logging.Logger = configure_logger()
 
 
-app = FastAPI(title=os.environ.get("API_TITLE", "Oracle of Ammon"), version="0.1.5")
+app = FastAPI(title=os.environ.get("API_TITLE", "Oracle of Ammon"), version="0.1.6")
 
 oracle = Oracle()
 

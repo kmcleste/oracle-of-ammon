@@ -28,7 +28,7 @@ To get started, checkout the help menu:
 oracle-of-ammon --help
 ```
 
-![Image of oracle-of-ammon cli help documentaiton](images/oracle-of-ammon-help.png)
+![Image of oracle-of-ammon cli help documentaiton](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/oracle-of-ammon-help.png?raw=true)
 
 Here, you will see we currently have two options: **summon** and **locust**.
 
@@ -38,10 +38,10 @@ By default, Summon is configured to initialize an empty search service on port 8
 
 Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each file extension, check out [this page](https://github.com/kmcleste/oracle-of-ammon/tree/main/oracle_of_ammon/data). Here's an example CSV file:
 
-[![Image of document format](images/haystack-faq.png)](https://docs.haystack.deepset.ai/docs/faq)
+[![Image of document format](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/haystack-faq.png?raw=true)](https://docs.haystack.deepset.ai/docs/faq)
 
 ### Locust
 
 [Locust](https://locust.io/) is an open source tool for load testing. You're able to swarm your system with millions of simultaneous users -- recording service performance and other metrics. By default, Locust will start on port 8089. To start a new load test, simply enter the number of users you want to simulate, their spawn rate, and the host address to swarm.
 
-[![Image of locust config](image/../images/locust-config.png)](https://locust.io)]
+[![Image of locust config](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/locust-config.png?raw=true)](https://locust.io)]
