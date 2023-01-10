@@ -45,3 +45,15 @@ Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each fi
 [Locust](https://locust.io/) is an open source tool for load testing. You're able to swarm your system with millions of simultaneous users -- recording service performance and other metrics. By default, Locust will start on port 8089. To start a new load test, simply enter the number of users you want to simulate, their spawn rate, and the host address to swarm.
 
 [![Image of locust config](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/locust-config.png?raw=true)](https://locust.io)]
+
+## Coming Eventually 👀
+
+- Semantic search
+- Document search
+- Document summarization
+- Document ranking
+- Multiple index support
+- Annotations/Feedback
+- Fine tuning
+- Custom pipelines
+- Dedicated docs wiki
