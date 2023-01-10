@@ -1,7 +1,7 @@
 # Oracle of Ammon
 
-![](https://img.shields.io/pypi/v/oracle-of-ammon?style=flat-square)
-![](https://img.shields.io/pypi/pyversions/oracle-of-ammon?style=flat-square)
+[![PyPI version shield](https://img.shields.io/pypi/v/oracle-of-ammon?style=flat-square)](https://pypi.org/project/oracle-of-ammon/)
+[![Python version shield](https://img.shields.io/pypi/pyversions/oracle-of-ammon?style=flat-square)](https://pypi.org/project/oracle-of-ammon/)
 
 A simple CLI tool for creating Search APIs.
 
@@ -36,7 +36,7 @@ Here, you will see we currently have two options: **summon** and **locust**.
 
 By default, Summon is configured to initialize an empty search service on port 8000. The API framework used is [FastAPI](https://fastapi.tiangolo.com/) and the underlying search engine is built on [Haystack](https://docs.haystack.deepset.ai/). If you would like to initialize the search service with documents upon startup, provide a filepath with the `--path` option. Once the service has been initialized, you can view the API docs at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-Documents must explicitly be CSV's in the form of question:answer pairs. An example document is show below:
+Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each file extension, check out [this page](https://github.com/kmcleste/oracle-of-ammon/tree/main/oracle_of_ammon/data). Here's an example CSV file:
 
 [![Image of document format](images/haystack-faq.png)](https://docs.haystack.deepset.ai/docs/faq)
 

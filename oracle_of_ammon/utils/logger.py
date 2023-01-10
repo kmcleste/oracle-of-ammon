@@ -4,9 +4,10 @@ import os
 from rich.logging import RichHandler
 
 
-def configure_logger(name: str = __file__) -> logging.Logger:
+def configure_logger(name: str = __name__) -> logging.Logger:
     log_fmt = "%(message)s"
     logger = logging.getLogger(name)
+    logger.propagate = False
 
     # ensures we do not print duplicate logs
     if logger.hasHandlers():

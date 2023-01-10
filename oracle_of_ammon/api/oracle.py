@@ -1,4 +1,3 @@
-from io import BytesIO
 import logging
 import os
 import sys
@@ -9,6 +8,7 @@ from haystack.document_stores import InMemoryDocumentStore
 from haystack.nodes import EmbeddingRetriever
 from haystack.pipelines import FAQPipeline
 import pandas as pd
+from tempfile import SpooledTemporaryFile
 
 from oracle_of_ammon.api.utils.filehandler import FileHandler
 from oracle_of_ammon.utils.logger import configure_logger
@@ -54,8 +54,15 @@ class Oracle:
             logger.error(f"Unable to create retriever: {e}")
             sys.exit(1)
 
-    def index_documents(self, data: BytesIO | str) -> None:
-        df: pd.DataFrame = pd.read_csv(filepath_or_buffer=data)
+    # TODO: Add logic if no-merge-sheets
+    def index_documents(
+        self,
+        filepath_or_buffer: SpooledTemporaryFile | str,
+        filename: str | None = None,
+    ) -> None:
+        df: pd.DataFrame = FileHandler.read_data(
+            filepath_of_buffer=filepath_or_buffer, filename=filename
+        )
 
         if df.empty:
             raise RuntimeError("Dataframe is empty. Check filepath is correct.")
@@ -74,15 +81,12 @@ class Oracle:
         except Exception as e:
             logger.warning(f"Unable to write documents to document store: {e}")
 
-    # TODO: Add excel, text, tsv, json, squad support
     def upload_documents(self, files: list[UploadFile]) -> dict:
         for file in files:
             try:
-                if ".csv" not in file.filename:
-                    logger.warning("No files selected.")
-                    return {"message": "No files selected."}
-
-                self.index_documents(data=file.file)
+                self.index_documents(
+                    filepath_or_buffer=file.file, filename=file.filename
+                )
 
             except Exception as exc:
                 logger.error(f"Unable to upload {file.filename}: {exc}")
@@ -98,7 +102,7 @@ class Oracle:
         DIR: str = os.getenv("OASIS_OF_SIWA")
         if DIR is not None:
             try:
-                self.index_documents(data=DIR)
+                self.index_documents(filepath_or_buffer=DIR)
 
             except Exception as e:
                 logger.error(f"Unable to create dataframe from CSV: {e}")

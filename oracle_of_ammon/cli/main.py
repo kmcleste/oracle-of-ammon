@@ -23,19 +23,30 @@ app = typer.Typer(help=description)
 def summon(
     path: Union[str, None] = typer.Option(
         default=None, help="Filepath of CSV used to pre-index document store."
-    )
+    ),
+    merge_sheets: Union[bool, None] = typer.Option(
+        default=True,
+        help="If using an excel file, merge contents of all sheets into one DataFrame.",
+    ),
+    title: Union[str, None] = typer.Option(
+        default=None, help="API documentation title."
+    ),
 ) -> None:
     """
     Summon the Oracle of Ammon. Default port: 8000
     """
     if path is not None:
         os.environ["OASIS_OF_SIWA"] = path
+    if merge_sheets is not None:
+        os.environ["MERGE_SHEETS"] = str(merge_sheets)
+    if title is not None:
+        os.environ["API_TITLE"] = title
 
     logger.debug("Summoning Ammon 🔮")
-    subprocess.call(  # nosec
+    subprocess.call(
         ["python3", "-m", "oracle_of_ammon.api.ammon"],
         env=os.environ,
-        shell=False,  # nosec
+        shell=False,
     )
 
 
