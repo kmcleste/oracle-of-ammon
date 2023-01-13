@@ -39,21 +39,9 @@ def test_summary_empty_docstore():
     assert parse_obj_as(HTTPError, response.json())
 
 
-def test_search():
-    response = client.post(
-        "/search",
-        json={
-            "query": "This is a question.",
-            "params": {"Retriever": {"top_k": 10}},
-        },
-    )
-    assert response.status_code == 200
-    assert parse_obj_as(SearchResponse, response.json())
-
-
 def test_upload():
     file = open(
-        file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "test.csv"), mode="br"
+        file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "faq.csv"), mode="br"
     )
     response = client.post("/upload-documents", files={"files": file})
     assert response.status_code == 201
@@ -64,3 +52,27 @@ def test_summary():
     response = client.get("/summary")
     assert response.status_code == 200
     assert parse_obj_as(Summary, response.json())
+
+
+def test_faq_search():
+    response = client.post(
+        "/faq-search",
+        json={
+            "query": "Why are duplicate answers being returned?",
+            "params": {"Retriever": {"top_k": 10}},
+        },
+    )
+    assert response.status_code == 200
+    assert parse_obj_as(SearchResponse, response.json())
+
+
+def test_document_search():
+    response = client.post(
+        "/document-search",
+        json={
+            "query": "Why are duplicate answers being returned?",
+            "params": {"Retriever": {"top_k": 10}},
+        },
+    )
+    assert response.status_code == 200
+    assert parse_obj_as(Documents, response.json())

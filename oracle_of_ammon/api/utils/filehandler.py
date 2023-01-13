@@ -73,7 +73,7 @@ class FileHandler:
         try:
             xls = pd.ExcelFile(path_or_buffer=path, engine="openpyxl")
             df: pd.DataFrame | dict[pd.DataFrame] = xls.parse(sheet_name=sheet_name)
-            if not merge_sheets:
+            if not cls.strtobool(merge_sheets):
                 return df
             else:
                 if len(xls.sheet_names) <= 1:
@@ -116,7 +116,7 @@ class FileHandler:
         try:
             return pd.read_csv(filepath_or_buffer=path, sep="\t")
         except Exception as e:
-            logger.error(f"Unable to convert CSV to DataFrame: {e}")
+            logger.error(f"Unable to convert TSV to DataFrame: {e}")
         finally:
             cls.file_clean_up(path=path)
 
@@ -148,3 +148,18 @@ class FileHandler:
             logger.error(f"Unable to convert JSON to DataFrame: {e}")
         finally:
             cls.file_clean_up(path=path)
+
+    @classmethod
+    def strtobool(cls, val: str) -> int:
+        """Convert a string representation of truth to true (1) or false (0).
+        True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+        are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+        'val' is anything else.
+        """
+        val: str = val.lower()
+        if val in ("y", "yes", "t", "true", "on", "1", "True"):
+            return 1
+        elif val in ("n", "no", "f", "false", "off", "0", "False"):
+            return 0
+        else:
+            raise ValueError("invalid truth value %r" % (val,))

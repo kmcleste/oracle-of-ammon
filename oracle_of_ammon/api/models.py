@@ -4,10 +4,14 @@ from haystack import Answer, Document
 from pydantic import BaseModel, Field, validator
 
 
+class Index(BaseModel):
+    index: str = Field(default="document", description="Name of the desired index")
+
+
 class Query(BaseModel):
     query: str = Field(..., description="Natural language question in sentence form")
     params: dict = Field(
-        {"Retriever": {"top_k": 3}},
+        {"Retriever": {"top_k": 3, "index": "document"}},
         description="Search Engine node component parameters",
     )
 

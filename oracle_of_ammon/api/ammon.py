@@ -17,6 +17,7 @@ from oracle_of_ammon.api.models import (
     Summary,
     HTTPError,
     Documents,
+    Index,
 )
 from oracle_of_ammon.utils.logger import configure_logger
 
@@ -96,13 +97,23 @@ async def root():
 
 
 @app.post(
-    path="/search",
+    path="/faq-search",
     status_code=status.HTTP_200_OK,
     tags=["search"],
     response_model=SearchResponse,
 )
 def search(input: Query):
-    return oracle.search(query=input.query, params=input.params)
+    return oracle.faq_search(query=input.query, params=input.params)
+
+
+@app.post(
+    path="/document-search",
+    status_code=status.HTTP_200_OK,
+    tags=["search"],
+    response_model=Documents,
+)
+def document_search(input: Query):
+    return oracle.document_search(query=input.query, params=input.params)
 
 
 @app.get(
@@ -115,16 +126,16 @@ def health():
     return get_health_status()
 
 
-@app.get(
+@app.post(
     path="/get-documents",
     status_code=status.HTTP_200_OK,
     tags=["documents"],
     response_model=Documents,
 )
-def get_documents():
+def get_documents(input: Index):
     return {
         "documents": oracle.document_store.get_all_documents(
-            index=oracle.index, return_embedding=False
+            index=input.index, return_embedding=False
         )
     }
 
@@ -136,12 +147,13 @@ def get_documents():
     response_model=UploadedDocuments,
 )
 def upload_documents(
-    files: list[UploadFile] = File(..., description="List of files to be indexed")
+    files: list[UploadFile] = File(..., description="List of files to be indexed."),
+    index: str = "document",
 ):
-    return oracle.upload_documents(files=files)
+    return oracle.upload_documents(files=files, index=index)
 
 
-@app.get(
+@app.post(
     path="/summary",
     status_code=status.HTTP_200_OK,
     tags=["documents"],
@@ -153,10 +165,12 @@ def upload_documents(
         },
     },
 )
-def summary():
+def summary(input: Index):
+    if input.index not in oracle.document_store.indexes.keys():
+        raise HTTPException(status_code=404, detail="Selected index does not exist.")
     if oracle.document_store.get_document_count() < 1:
         raise HTTPException(status_code=404, detail="Document store is empty.")
-    return oracle.document_store.describe_documents(index=oracle.index)
+    return oracle.document_store.describe_documents(index=input.index)
 
 
 if __name__ == "__main__":
