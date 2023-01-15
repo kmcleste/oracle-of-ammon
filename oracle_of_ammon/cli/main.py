@@ -2,7 +2,7 @@ import logging
 import os
 import pathlib
 import subprocess  # nosec
-from typing import Union
+from typing import Union, List
 import typer
 
 from oracle_of_ammon.utils.logger import configure_logger
@@ -24,9 +24,9 @@ def summon(
     path: Union[str, None] = typer.Option(
         default=None, help="Filepath of CSV used to pre-index document store."
     ),
-    merge_sheets: Union[bool, None] = typer.Option(
-        default=True,
-        help="If using an excel file, merge contents of all sheets into one DataFrame.",
+    sheet_name: Union[str, None] = typer.Option(
+        default=None,
+        help="If using an excel file, select which sheet(s) to load. If none provided, all sheets will be loaded. Expects a comma-separated list.",
     ),
     title: Union[str, None] = typer.Option(
         default=None, help="API documentation title."
@@ -37,8 +37,8 @@ def summon(
     """
     if path is not None:
         os.environ["OASIS_OF_SIWA"] = path
-    if merge_sheets is not None:
-        os.environ["MERGE_SHEETS"] = str(merge_sheets)
+    if sheet_name is not None:
+        os.environ["SHEET_NAME"] = sheet_name
     if title is not None:
         os.environ["API_TITLE"] = title
 

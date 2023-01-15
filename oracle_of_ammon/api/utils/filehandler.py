@@ -25,7 +25,10 @@ class FileHandler:
 
     @classmethod
     def read_data(
-        cls, filepath_of_buffer: SpooledTemporaryFile | str, filename: str | None = None
+        cls,
+        filepath_of_buffer: SpooledTemporaryFile | str,
+        filename: str | None = None,
+        **kwargs,
     ):
         try:
             if isinstance(filepath_of_buffer, SpooledTemporaryFile):
@@ -42,7 +45,7 @@ class FileHandler:
             if path.endswith(".csv"):
                 return cls.read_csv(path=path)
             if path.endswith(".xlsx"):
-                return cls.read_excel(path=path)
+                return cls.read_excel(path=path, sheet_name=kwargs.get("sheet_name"))
             if path.endswith(".txt"):
                 return cls.read_text(path=path)
             if path.endswith(".tsv"):
@@ -65,27 +68,19 @@ class FileHandler:
 
     @classmethod
     def read_excel(
-        cls,
-        path: str | pathlib.Path,
-        sheet_name: str | None = os.environ.get("SHEET_NAME", None),
-        merge_sheets: bool = os.environ.get("MERGE_SHEETS", True),
-    ) -> pd.DataFrame | dict[pd.DataFrame]:
+        cls, path: str | pathlib.Path, sheet_name: list[str] | None = None
+    ) -> pd.DataFrame:
         try:
             xls = pd.ExcelFile(path_or_buffer=path, engine="openpyxl")
-            df: pd.DataFrame | dict[pd.DataFrame] = xls.parse(sheet_name=sheet_name)
-            if not cls.strtobool(merge_sheets):
-                return df
+            df: dict[pd.DataFrame] = xls.parse(sheet_name=sheet_name)
+
+            if len(df.keys()) == 1:
+                return list(df.values())[0]
+
             else:
-                if len(xls.sheet_names) <= 1:
-                    logger.debug("Only 1 sheet was provided. Skipping merge.")
-                    df: pd.DataFrame
-                    return df
-                else:
-                    logger.debug("Merging DataFrames...")
-                    combined: pd.DataFrame = pd.concat(
-                        objs=df, axis=0, ignore_index=True
-                    )
-                    return combined
+                logger.debug("Merging DataFrames...")
+                combined: pd.DataFrame = pd.concat(objs=df, axis=0, ignore_index=True)
+                return combined
 
         except Exception as e:
             logger.error(f"Unable to convert XLSX file to DataFrame: {e}")
@@ -148,18 +143,3 @@ class FileHandler:
             logger.error(f"Unable to convert JSON to DataFrame: {e}")
         finally:
             cls.file_clean_up(path=path)
-
-    @classmethod
-    def strtobool(cls, val: str) -> int:
-        """Convert a string representation of truth to true (1) or false (0).
-        True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
-        are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
-        'val' is anything else.
-        """
-        val: str = val.lower()
-        if val in ("y", "yes", "t", "true", "on", "1", "True"):
-            return 1
-        elif val in ("n", "no", "f", "false", "off", "0", "False"):
-            return 0
-        else:
-            raise ValueError("invalid truth value %r" % (val,))

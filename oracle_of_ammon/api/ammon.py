@@ -149,8 +149,11 @@ def get_documents(input: Index):
 def upload_documents(
     files: list[UploadFile] = File(..., description="List of files to be indexed."),
     index: str = "document",
+    sheet_name: str | None = None,
 ):
-    return oracle.upload_documents(files=files, index=index)
+    return oracle.upload_documents(
+        files=files, index=index, **{"sheet_name": sheet_name}
+    )
 
 
 @app.post(
