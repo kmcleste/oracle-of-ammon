@@ -55,5 +55,6 @@ Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each fi
 - Multiple index support
 - Annotations/Feedback
 - Fine tuning
+- Dynamic Locust config
 - Custom pipelines
 - Dedicated docs wiki
