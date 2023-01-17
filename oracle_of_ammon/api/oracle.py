@@ -97,7 +97,7 @@ class Oracle:
             except Exception as e:
                 logger.warning(f"Unable to write documents to document store: {e}")
 
-    def upload_documents(
+    def upload_faq(
         self, files: list[UploadFile], index: str = "document", **kwargs
     ) -> dict:
         for file in files:

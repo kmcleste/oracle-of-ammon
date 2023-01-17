@@ -27,7 +27,7 @@ class Documents(BaseModel):
     documents: List[Document]
 
 
-class UploadedDocuments(BaseModel):
+class UploadedFaq(BaseModel):
     message: str = Field(..., description="Status of file upload")
 
 

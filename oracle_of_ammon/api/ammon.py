@@ -13,7 +13,7 @@ from oracle_of_ammon.api.models import (
     Query,
     SearchResponse,
     HealthResponse,
-    UploadedDocuments,
+    UploadedFaq,
     Summary,
     HTTPError,
     Documents,
@@ -141,19 +141,17 @@ def get_documents(input: Index):
 
 
 @app.post(
-    path="/upload-documents",
+    path="/upload-faq",
     status_code=status.HTTP_201_CREATED,
     tags=["documents"],
-    response_model=UploadedDocuments,
+    response_model=UploadedFaq,
 )
-def upload_documents(
+def upload_faq(
     files: list[UploadFile] = File(..., description="List of files to be indexed."),
     index: str = "document",
     sheet_name: str | None = None,
 ):
-    return oracle.upload_documents(
-        files=files, index=index, **{"sheet_name": sheet_name}
-    )
+    return oracle.upload_faq(files=files, index=index, **{"sheet_name": sheet_name})
 
 
 @app.post(
