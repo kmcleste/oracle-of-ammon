@@ -34,7 +34,7 @@ Here, you will see we currently have two options: **summon** and **locust**.
 
 ### Summon
 
-By default, Summon is configured to initialize an empty search service on port 8000. The API framework used is [FastAPI](https://fastapi.tiangolo.com/) and the underlying search engine is built on [Haystack](https://docs.haystack.deepset.ai/). If you would like to initialize the search service with documents upon startup, provide a filepath with the `--path` option. Once the service has been initialized, you can view the API docs at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+By default, Summon is configured to initialize an empty search service on port 8000. The API framework used is [FastAPI](https://fastapi.tiangolo.com/) and the underlying search engine is built on [Haystack](https://docs.haystack.deepset.ai/). If you would like to initialize the search service with documents upon startup, provide a filepath with the `--path` option. Once the service has been initialized, you can view the API docs at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). An offline version of the documentation can be found [here](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/kmcleste/oracle-of-ammon/main/openapi.json#/).
 
 Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each file extension, check out [this page](https://github.com/kmcleste/oracle-of-ammon/tree/main/oracle_of_ammon/data). Here's an example CSV file:
 
