@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional
 
 from haystack import Answer, Document
@@ -5,21 +6,24 @@ from pydantic import BaseModel, Field, validator
 
 
 class Index(BaseModel):
-    index: str = Field(default="document", description="Name of the desired index")
+    index: str = Field(
+        default=os.environ.get("INDEX", "document"),
+        description="Name of the desired index.",
+    )
 
 
-class Query(BaseModel):
-    query: str = Field(..., description="Natural language question in sentence form")
+class Search(BaseModel):
+    query: str = Field(..., description="Natural language question in sentence form.")
     params: dict = Field(
-        {"Retriever": {"top_k": 3, "index": "document"}},
-        description="Search Engine node component parameters",
+        {"Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}},
+        description="Search Engine node component parameters.",
     )
 
 
 class SearchResponse(BaseModel):
-    query: str = Field(..., description="Query posed by the user")
+    query: str = Field(..., description="Query posed by the user.")
     answers: List[Answer] = Field(
-        ..., description="List of answers in descending order by relevance score"
+        ..., description="List of answers in descending order by relevance score."
     )
 
 
@@ -27,29 +31,29 @@ class Documents(BaseModel):
     documents: List[Document]
 
 
-class UploadedFaq(BaseModel):
-    message: str = Field(..., description="Status of file upload")
+class UploadedDocuments(BaseModel):
+    message: str = Field(..., description="Status of file upload.")
 
 
 class Summary(BaseModel):
-    count: int = Field(..., description="Count of documents in an index")
+    count: int = Field(..., description="Count of documents in an index.")
     chars_mean: float = Field(
-        ..., description="Mean characters across all documents in an index"
+        ..., description="Mean characters across all documents in an index."
     )
     chars_max: int = Field(
-        ..., description="Maximum characters in any 1 document across an index"
+        ..., description="Maximum characters in any 1 document across an index.."
     )
     chars_min: int = Field(
-        ..., description="Minimum characters in any 1 document across an index"
+        ..., description="Minimum characters in any 1 document across an index."
     )
     chars_median: int = Field(
-        ..., description="Median characters across all documents in an index"
+        ..., description="Median characters across all documents in an index."
     )
 
 
 class HTTPError(BaseModel):
     detail: str = Field(
-        ..., description="Message explaining the reason for HTTPException"
+        ..., description="Message explaining the reason for HTTPException."
     )
 
     class Config:
@@ -57,7 +61,7 @@ class HTTPError(BaseModel):
 
 
 class CPUUsage(BaseModel):
-    used: float = Field(..., description="REST API average CPU usage in percentage")
+    used: float = Field(..., description="REST API average CPU usage in percentage.")
 
     @validator("used")
     @classmethod
@@ -66,7 +70,7 @@ class CPUUsage(BaseModel):
 
 
 class MemoryUsage(BaseModel):
-    used: float = Field(..., description="REST API used memory in percentage")
+    used: float = Field(..., description="REST API used memory in percentage.")
 
     @validator("used")
     @classmethod
@@ -75,10 +79,10 @@ class MemoryUsage(BaseModel):
 
 
 class GPUUsage(BaseModel):
-    kernel_usage: float = Field(..., description="GPU kernel usage in percentage")
-    memory_total: int = Field(..., description="Total GPU memory in megabytes")
+    kernel_usage: float = Field(..., description="GPU kernel usage in percentage.")
+    memory_total: int = Field(..., description="Total GPU memory in megabytes.")
     memory_used: Optional[int] = Field(
-        ..., description="REST API used GPU memory in megabytes"
+        ..., description="REST API used GPU memory in megabytes."
     )
 
     @validator("kernel_usage")
@@ -88,12 +92,12 @@ class GPUUsage(BaseModel):
 
 
 class GPUInfo(BaseModel):
-    index: int = Field(..., description="GPU index")
-    usage: GPUUsage = Field(..., description="GPU usage details")
+    index: int = Field(..., description="GPU index.")
+    usage: GPUUsage = Field(..., description="GPU usage details.")
 
 
 class HealthResponse(BaseModel):
-    version: str = Field(..., description="Haystack version")
-    cpu: CPUUsage = Field(..., description="CPU usage details")
-    memory: MemoryUsage = Field(..., description="Memory usage details")
-    gpus: List[GPUInfo] = Field(default_factory=list, description="GPU usage details")
+    version: str = Field(..., description="Haystack version.")
+    cpu: CPUUsage = Field(..., description="CPU usage details.")
+    memory: MemoryUsage = Field(..., description="Memory usage details.")
+    gpus: List[GPUInfo] = Field(default_factory=list, description="GPU usage details.")

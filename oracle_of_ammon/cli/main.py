@@ -22,7 +22,7 @@ app = typer.Typer(help=description)
 @app.command()
 def summon(
     path: Union[str, None] = typer.Option(
-        default=None, help="Filepath of CSV used to pre-index document store."
+        default=None, help="Filepath of file used to pre-index document store."
     ),
     sheet_name: Union[str, None] = typer.Option(
         default=None,
@@ -30,6 +30,9 @@ def summon(
     ),
     title: Union[str, None] = typer.Option(
         default=None, help="API documentation title."
+    ),
+    index: Union[str, None] = typer.Option(
+        default=None, help="Default index name to upload documents to."
     ),
 ) -> None:
     """
@@ -41,6 +44,8 @@ def summon(
         os.environ["SHEET_NAME"] = sheet_name
     if title is not None:
         os.environ["API_TITLE"] = title
+    if index is not None:
+        os.environ["INDEX"] = index
 
     logger.debug("Summoning Ammon 🔮")
     subprocess.call(

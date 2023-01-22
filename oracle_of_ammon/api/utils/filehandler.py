@@ -5,6 +5,9 @@ import pathlib
 from tempfile import SpooledTemporaryFile, tempdir
 
 import pandas as pd
+from haystack import Document
+from haystack.nodes import PreProcessor
+from haystack.utils import convert_files_to_docs
 
 from oracle_of_ammon.utils.logger import configure_logger
 
@@ -24,23 +27,67 @@ class FileHandler:
             logger.error(f"Unable to delete file: {e}")
 
     @classmethod
-    def read_data(
+    def read_documents(
         cls,
-        filepath_of_buffer: SpooledTemporaryFile | str,
+        preprocessor: PreProcessor,
+        filepath_or_buffer: SpooledTemporaryFile | str,
         filename: str | None = None,
         **kwargs,
-    ):
+    ) -> list[Document]:
         try:
-            if isinstance(filepath_of_buffer, SpooledTemporaryFile):
+            if isinstance(filepath_or_buffer, SpooledTemporaryFile):
                 try:
                     path = os.path.join(tempdir, filename)
                     logger.debug(path)
                     with open(file=path, mode="wb") as f:
-                        f.write(filepath_of_buffer.read())
+                        f: SpooledTemporaryFile
+                        f.write(filepath_or_buffer.read())
                 except Exception as e:
                     logger.error(f"Unable to write to temporary file: {e}")
             else:
-                path = filepath_of_buffer
+                path = filepath_or_buffer
+
+            try:
+                with open(file=path, mode="r") as f:
+                    content = f.read()
+                logger.debug(content)
+
+                meta: dict = {
+                    "filepath_of_buffer": filepath_or_buffer,
+                    "filename": filename,
+                }
+
+                doc: Document = preprocessor.process(
+                    Document(content=content, meta=meta)
+                )
+
+                return doc
+
+            except Exception as e:
+                logger.error(f"Unable to read from file: {e}")
+
+        except Exception as e:
+            logger.error(f"Unable to read file: {e}")
+
+    @classmethod
+    def read_faq(
+        cls,
+        filepath_or_buffer: SpooledTemporaryFile | str,
+        filename: str | None = None,
+        **kwargs,
+    ) -> pd.DataFrame:
+        try:
+            if isinstance(filepath_or_buffer, SpooledTemporaryFile):
+                try:
+                    path = os.path.join(tempdir, filename)
+                    logger.debug(path)
+                    with open(file=path, mode="wb") as f:
+                        f: SpooledTemporaryFile
+                        f.write(filepath_or_buffer.read())
+                except Exception as e:
+                    logger.error(f"Unable to write to temporary file: {e}")
+            else:
+                path = filepath_or_buffer
 
             if path.endswith(".csv"):
                 return cls.read_csv(path=path)

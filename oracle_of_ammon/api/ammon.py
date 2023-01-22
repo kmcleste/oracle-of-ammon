@@ -3,17 +3,17 @@
 import logging
 import os
 
-from fastapi import FastAPI, status, UploadFile, File, HTTPException
+from fastapi import FastAPI, status, UploadFile, File, HTTPException, Query
 from fastapi.responses import HTMLResponse
 import uvicorn
 
 from oracle_of_ammon.api.oracle import Oracle
 from oracle_of_ammon.api.health import get_health_status
 from oracle_of_ammon.api.models import (
-    Query,
+    Search,
     SearchResponse,
     HealthResponse,
-    UploadedFaq,
+    UploadedDocuments,
     Summary,
     HTTPError,
     Documents,
@@ -102,8 +102,17 @@ async def root():
     tags=["search"],
     response_model=SearchResponse,
 )
-def search(input: Query):
+def faq_search(input: Search):
     return oracle.faq_search(query=input.query, params=input.params)
+
+
+@app.post(
+    path="/extractive-search",
+    status_code=status.HTTP_200_OK,
+    tags=["search"],
+)
+def extractive_search(input: Search):
+    return oracle.extractive_search(query=input.query, params=input.params)
 
 
 @app.post(
@@ -112,7 +121,7 @@ def search(input: Query):
     tags=["search"],
     response_model=Documents,
 )
-def document_search(input: Query):
+def document_search(input: Search):
     return oracle.document_search(query=input.query, params=input.params)
 
 
@@ -130,28 +139,48 @@ def health():
     path="/get-documents",
     status_code=status.HTTP_200_OK,
     tags=["documents"],
-    response_model=Documents,
+    # response_model=Documents,
 )
 def get_documents(input: Index):
     return {
-        "documents": oracle.document_store.get_all_documents(
-            index=input.index, return_embedding=False
-        )
+        "faq": {
+            "documents": oracle.faq_document_store.get_all_documents(
+                index=input.index, return_embedding=False
+            )
+        },
+        "semantic": {
+            "documents": oracle.semantic_document_store.get_all_documents(
+                index=input.index, return_embedding=False
+            )
+        },
     }
 
 
 @app.post(
-    path="/upload-faq",
+    path="/upload-documents",
     status_code=status.HTTP_201_CREATED,
     tags=["documents"],
-    response_model=UploadedFaq,
+    response_model=UploadedDocuments,
 )
-def upload_faq(
+def upload_documents(
     files: list[UploadFile] = File(..., description="List of files to be indexed."),
-    index: str = "document",
-    sheet_name: str | None = None,
+    index: str = Query(
+        default=os.environ.get("INDEX", "document"),
+        description="Name of the desired index.",
+    ),
+    sheet_name: str
+    | None = Query(
+        "sheet_name",
+        description="The sheet name(s) to index when uploading an XLSX file. Expects comma-separated string.",
+    ),
+    is_faq: bool = Query(
+        False,
+        description="Flag for if the uploaded content is intended to be used for FAQ.",
+    ),
 ):
-    return oracle.upload_faq(files=files, index=index, **{"sheet_name": sheet_name})
+    return oracle.upload_documents(
+        files=files, index=index, **{"sheet_name": sheet_name, "is_faq": is_faq}
+    )
 
 
 @app.post(
