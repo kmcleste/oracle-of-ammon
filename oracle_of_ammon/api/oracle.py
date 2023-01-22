@@ -175,7 +175,7 @@ class Oracle:
                 update_existing_embeddings=False,
             )
         else:
-            logger.debug("DOWN HERE")
+            return
 
     def upload_documents(
         self,

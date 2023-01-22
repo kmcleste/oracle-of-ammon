@@ -1,1 +1,25 @@
-Hello. My name is Kyle McLester. I am a Senior Software Engineer at Ally Financial. My favorite color is sage green. I've lived in Charlotte, NC for over 20 years.
+Background
+The project aims to train sentence embedding models on very large sentence level datasets using a self-supervised contrastive learning objective. We used the pretrained nreimers/MiniLM-L6-H384-uncased model and fine-tuned in on a 1B sentence pairs dataset. We use a contrastive learning objective: given a sentence from the pair, the model should predict which out of a set of randomly sampled other sentences, was actually paired with it in our dataset.
+
+We developped this model during the Community week using JAX/Flax for NLP & CV, organized by Hugging Face. We developped this model as part of the project: Train the Best Sentence Embedding Model Ever with 1B Training Pairs. We benefited from efficient hardware infrastructure to run the project: 7 TPUs v3-8, as well as intervention from Googles Flax, JAX, and Cloud team member about efficient deep learning frameworks.
+
+Intended uses
+Our model is intented to be used as a sentence and short paragraph encoder. Given an input text, it ouptuts a vector which captures the semantic information. The sentence vector may be used for information retrieval, clustering or sentence similarity tasks.
+
+By default, input text longer than 256 word pieces is truncated.
+
+Training procedure
+Pre-training
+We use the pretrained nreimers/MiniLM-L6-H384-uncased model. Please refer to the model card for more detailed information about the pre-training procedure.
+
+Fine-tuning
+We fine-tune the model using a contrastive objective. Formally, we compute the cosine similarity from each possible sentence pairs from the batch. We then apply the cross entropy loss by comparing with true pairs.
+
+Hyper parameters
+We trained ou model on a TPU v3-8. We train the model during 100k steps using a batch size of 1024 (128 per TPU core). We use a learning rate warm up of 500. The sequence length was limited to 128 tokens. We used the AdamW optimizer with a 2e-5 learning rate. The full training script is accessible in this current repository: train_script.py.
+
+Training data
+We use the concatenation from multiple datasets to fine-tune our model. The total number of sentence pairs is above 1 billion sentences. We sampled each dataset given a weighted probability which configuration is detailed in the data_config.json file.
+
+
+SOURCE: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
