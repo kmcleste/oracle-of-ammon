@@ -1,25 +1,26 @@
-Background
-The project aims to train sentence embedding models on very large sentence level datasets using a self-supervised contrastive learning objective. We used the pretrained nreimers/MiniLM-L6-H384-uncased model and fine-tuned in on a 1B sentence pairs dataset. We use a contrastive learning objective: given a sentence from the pair, the model should predict which out of a set of randomly sampled other sentences, was actually paired with it in our dataset.
+Ammon is the name of a Libyan deity and his oracle in the desert. It became famous after Alexander the Great made a detour to consult the god. The modern name is Siwa.
 
-We developped this model during the Community week using JAX/Flax for NLP & CV, organized by Hugging Face. We developped this model as part of the project: Train the Best Sentence Embedding Model Ever with 1B Training Pairs. We benefited from efficient hardware infrastructure to run the project: 7 TPUs v3-8, as well as intervention from Googles Flax, JAX, and Cloud team member about efficient deep learning frameworks.
+Oracle at Siwa
+Ammon was a Libyan deity, whose oracle was situated in the Siwa oasis, some 500 km west of Memphis, the capital of ancient Egypt. The oasis was also called Ammon. The Egyptians identified the god with their own supreme deity Amun; they called god of the oracle "Amun of Siwa, lord of good counsel". The fact that the site was hard to reach, must have contributed to the feeling that an oracle from Ammon was something special - and therefore reliable.
 
-Intended uses
-Our model is intented to be used as a sentence and short paragraph encoder. Given an input text, it ouptuts a vector which captures the semantic information. The sentence vector may be used for information retrieval, clustering or sentence similarity tasks.
+The place is extremely hot; in the summer, the average temperatures range between 22º C during the night and 37º C during the day, with 48º C being a normal maximum. Until recently, the average annual rainfall was less than 8 mm; the global climate change, however, has changed this, and there have been several heavy rains in the first decade of the twenty-first centuries. This is disastrous, because the houses of Siwa have, for centuries, been made of dried mud. The site is dominated by hight artificial mounds (shali).
 
-By default, input text longer than 256 word pieces is truncated.
+Because Siwa is located in a depression, the water table is comparatively high, varying between three meters below the surface to just 50 centimeters. As a consequence, there are many wells: 281 by one counting (e.g., "Cleopatra's Bath" - in Antiquity known as "Spring of the Sun"). Because they produce more water than evaporates, there are large, silty lakes east and west of the main settlement. The gardens of Siwa have always been located near the springs, and produce(d) olives and dates; barley and figs were less important.
 
-Training procedure
-Pre-training
-We use the pretrained nreimers/MiniLM-L6-H384-uncased model. Please refer to the model card for more detailed information about the pre-training procedure.
+Siwa was too far away and too isolated to be a real part of the Egyptian kingdom, but there may have been indirect control. We are certain that during the Nineteenth Dynasty, there was a fort north of Siwa, at Umm el-Rakham on the coast. This proves that the pharaohs were interested in the far west. After the fall of the New Kingdom, Siwa was certainly independent, and it is no strange idea that the Libyan kings of the Twenty-Second and Twenty-Third Dynasties were somehow related to the rulers of Siwa.
 
-Fine-tuning
-We fine-tune the model using a contrastive objective. Formally, we compute the cosine similarity from each possible sentence pairs from the batch. We then apply the cross entropy loss by comparing with true pairs.
+Siwa finally became a fully integrated part of Egypt after the domestication of the dromedary had made desert travel easier, for example to Egypt in the east, the Cyrenaica in the northwest and the Nasamones in the west. Among the oasis' exports was salt.
 
-Hyper parameters
-We trained ou model on a TPU v3-8. We train the model during 100k steps using a batch size of 1024 (128 per TPU core). We use a learning rate warm up of 500. The sequence length was limited to 128 tokens. We used the AdamW optimizer with a 2e-5 learning rate. The full training script is accessible in this current repository: train_script.py.
+A shrine was built by pharaoh Amasis (reign 570-526 BCE): a political act, intended to gain support from the Libyan tribes that had played a decisive role during Amasis' accession. A similar motive may have been behind the second temple, built by Nectanebo II (reign 359/358-342/341 BCE).
 
-Training data
-We use the concatenation from multiple datasets to fine-tune our model. The total number of sentence pairs is above 1 billion sentences. We sampled each dataset given a weighted probability which configuration is detailed in the data_config.json file.
+Amasis' sanctuary has been excavated on the acropolis, a shali hill now called Aghurmi, and is remarkable because it does not look like an Egyptian temple at all. In fact, the cult seems to have remained Libyan in nature, something that is more or less confirmed by the fact that the local ruler of the oasis is not depicted as Amasis' subject but as his equal. The cult of Ammon had been Egyptianized only superficially.
 
+Greek Ammon
+In the fifth century, the Greek researcher Herodotus of Halicarnassus stated in his Histories that the Lydian king Croesus (560-546 BCE) had offered sacrifices to the god Ammon. It is possible that Herodotus is right; after all, Croesus was allied to Amasis. Besides, by now, the cult had began to spread outside Egypt.
 
-SOURCE: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
+The first Greeks to visit the shrine were people from Cyrenaica, who knew the site through caravan trade. They called the god Zeus Ammon. Of course, Ammon is a bad rendering of Amun, but the name was nonetheless very fitting: ammos was the Greek word for "sand" - in other words, the Greeks called the god Sandy Zeus. His cult spread to the Greek world, and was especially propagated by the poet Pindar (522-445 BCE), who was the first Greek to dedicate an ode to the god and one of the first Greeks to erect a statue to the god. Later visitors included the Athenian commander Cimon, the Macedonian king Alexander the Great, and the Carthaginian leader Hannibal.
+
+Roman Period
+In the Roman age, the oracle was not really forgotten, but there were not many visitors. Still, an inscription was found that dates to the reign of Trajan (98-117 CE), and of course there were people living at Siwa. Many tombs with Roman architectural elements have been found, suggesting substantial wealth in the first and second centuries CE. A mud-brick building may have been a Roman fort or a church, and we know of a sixth-century Christian leader named Ammoneki. After Islam arrived, the ancient oracle was converted into a mosque.
+
+SOURCE: Livius, . "Ammon (Deity)." World History Encyclopedia. World History Encyclopedia, 03 Aug 2011. Web. 21 Jan 2023.

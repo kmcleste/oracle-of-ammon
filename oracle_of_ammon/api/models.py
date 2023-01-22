@@ -10,6 +10,7 @@ class Index(BaseModel):
         default=os.environ.get("INDEX", "document"),
         description="Name of the desired index.",
     )
+    is_faq: bool = Field(default=False, description="Which document store to access.")
 
 
 class Search(BaseModel):

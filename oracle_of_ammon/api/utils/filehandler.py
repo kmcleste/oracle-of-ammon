@@ -7,7 +7,6 @@ from tempfile import SpooledTemporaryFile, tempdir
 import pandas as pd
 from haystack import Document
 from haystack.nodes import PreProcessor
-from haystack.utils import convert_files_to_docs
 
 from oracle_of_ammon.utils.logger import configure_logger
 

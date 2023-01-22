@@ -139,21 +139,21 @@ def health():
     path="/get-documents",
     status_code=status.HTTP_200_OK,
     tags=["documents"],
-    # response_model=Documents,
+    response_model=Documents,
 )
 def get_documents(input: Index):
-    return {
-        "faq": {
+    if input.is_faq:
+        return {
             "documents": oracle.faq_document_store.get_all_documents(
                 index=input.index, return_embedding=False
             )
-        },
-        "semantic": {
+        }
+    else:
+        return {
             "documents": oracle.semantic_document_store.get_all_documents(
                 index=input.index, return_embedding=False
             )
-        },
-    }
+        }
 
 
 @app.post(
@@ -175,7 +175,7 @@ def upload_documents(
     ),
     is_faq: bool = Query(
         False,
-        description="Flag for if the uploaded content is intended to be used for FAQ.",
+        description="Which document store to access.",
     ),
 ):
     return oracle.upload_documents(
@@ -196,11 +196,22 @@ def upload_documents(
     },
 )
 def summary(input: Index):
-    if input.index not in oracle.document_store.indexes.keys():
-        raise HTTPException(status_code=404, detail="Selected index does not exist.")
-    if oracle.document_store.get_document_count() < 1:
-        raise HTTPException(status_code=404, detail="Document store is empty.")
-    return oracle.document_store.describe_documents(index=input.index)
+    if not input.is_faq:
+        if input.index not in oracle.semantic_document_store.indexes.keys():
+            raise HTTPException(
+                status_code=404, detail="Selected index does not exist."
+            )
+        if oracle.semantic_document_store.get_document_count() < 1:
+            raise HTTPException(status_code=404, detail="Document store is empty.")
+        return oracle.semantic_document_store.describe_documents(index=input.index)
+    else:
+        if input.index not in oracle.faq_document_store.indexes.keys():
+            raise HTTPException(
+                status_code=404, detail="Selected index does not exist."
+            )
+        if oracle.faq_document_store.get_document_count() < 1:
+            raise HTTPException(status_code=404, detail="Document store is empty.")
+        return oracle.faq_document_store.describe_documents(index=input.index)
 
 
 if __name__ == "__main__":
