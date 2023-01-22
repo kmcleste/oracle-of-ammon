@@ -48,11 +48,11 @@ Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each fi
 
 ## Coming Eventually 👀
 
-- Semantic search
-- Document search
+- ~~Semantic search~~
+- ~~Document search~~
 - Document summarization
 - Document ranking
-- Multiple index support
+- ~~Multiple index support~~
 - Annotations/Feedback
 - Fine tuning
 - Dynamic Locust config
