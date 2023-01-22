@@ -13,6 +13,3 @@ test:
 	poetry run pytest
 
 cicd: black bandit test
-
-oracle:
-	poetry run python oracle_of_ammon/cli/main.py

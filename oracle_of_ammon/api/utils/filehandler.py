@@ -31,7 +31,6 @@ class FileHandler:
         preprocessor: PreProcessor,
         filepath_or_buffer: SpooledTemporaryFile | str,
         filename: str | None = None,
-        **kwargs,
     ) -> list[Document]:
         try:
             if isinstance(filepath_or_buffer, SpooledTemporaryFile):
@@ -49,7 +48,6 @@ class FileHandler:
             try:
                 with open(file=path, mode="r") as f:
                     content = f.read()
-                logger.debug(content)
 
                 meta: dict = {
                     "filepath_of_buffer": filepath_or_buffer,

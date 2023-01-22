@@ -34,6 +34,9 @@ def summon(
     index: Union[str, None] = typer.Option(
         default=None, help="Default index name to upload documents to."
     ),
+    faq: Union[bool, None] = typer.Option(
+        default=True, help="Designation for content preloaded into the document store."
+    ),
 ) -> None:
     """
     Summon the Oracle of Ammon. Default port: 8000
@@ -46,6 +49,8 @@ def summon(
         os.environ["API_TITLE"] = title
     if index is not None:
         os.environ["INDEX"] = index
+    if faq is not None:
+        os.environ["IS_FAQ"] = str(faq)
 
     logger.debug("Summoning Ammon 🔮")
     subprocess.call(

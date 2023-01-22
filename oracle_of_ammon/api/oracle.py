@@ -116,7 +116,6 @@ class Oracle:
         except Exception as e:
             logger.error(f"Unable to create reader: {e}")
 
-    # TODO: extend indexing to determine FAQ vs Open Domain
     def index_documents(
         self,
         filepath_or_buffer: SpooledTemporaryFile
@@ -125,7 +124,8 @@ class Oracle:
         index: str = os.environ.get("INDEX", "document"),
         **kwargs,
     ) -> None:
-        if kwargs.get("is_faq") and filepath_or_buffer:
+        is_faq = os.environ.get("IS_FAQ") == "True"
+        if kwargs.get("is_faq", is_faq) and filepath_or_buffer:
             SHEET_NAME: str = kwargs.get(
                 "sheet_name", os.environ.get("SHEET_NAME", None)
             )
@@ -159,12 +159,11 @@ class Oracle:
 
                 except Exception as e:
                     logger.warning(f"Unable to write documents to document store: {e}")
-        elif not kwargs.get("is_faq") and filepath_or_buffer:
+        elif not kwargs.get("is_faq", is_faq) and filepath_or_buffer:
             documents: list[Document] = FileHandler.read_documents(
                 preprocessor=self.preprocessor,
                 filepath_or_buffer=filepath_or_buffer,
                 filename=filename,
-                **kwargs,
             )
             self.semantic_document_store.write_documents(
                 documents=documents, index=index, duplicate_documents="skip"
