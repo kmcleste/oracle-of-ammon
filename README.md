@@ -7,7 +7,7 @@ A simple CLI tool for creating Search APIs.
 
 ## Installation
 
-Creating a virtual environment is highly advised. To do so, run:
+Creating a virtual environment is highly recommended. To do so, run:
 
 ```bash
 python3 -m venv .venv
@@ -28,17 +28,28 @@ To get started, checkout the help menu:
 oracle-of-ammon --help
 ```
 
-![Image of oracle-of-ammon cli help documentaiton](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/oracle-of-ammon-help.png?raw=true)
+![Image of oracle-of-ammon cli help documentaiton](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/oracle-of-ammon-help.gif?raw=true)
 
 Here, you will see we currently have two options: **summon** and **locust**.
 
 ### Summon
 
-By default, Summon is configured to initialize an empty search service on port 8000. The API framework used is [FastAPI](https://fastapi.tiangolo.com/) and the underlying search engine is built on [Haystack](https://docs.haystack.deepset.ai/). If you would like to initialize the search service with documents upon startup, provide a filepath with the `--path` option. Once the service has been initialized, you can view the API docs at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). A web-hosted version of the documentation can be found [here](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/kmcleste/oracle-of-ammon/main/openapi.json#/).
+By default, Summon is configured to initialize an empty search service on port 8000. The API framework used is [FastAPI](https://fastapi.tiangolo.com/) and the underlying search engine is built on [Haystack](https://docs.haystack.deepset.ai/). If you would like to initialize the search service with documents upon startup, provide a filepath with the `--path` option. Once the service has been initialized, you can view the API docs at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). A static version of the swagger documentation can also be found [here](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/kmcleste/oracle-of-ammon/main/openapi.json#/).
 
-Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each file extension, check out [this page](https://github.com/kmcleste/oracle-of-ammon/tree/main/oracle_of_ammon/data). Here's an example CSV file:
+| Option        | Type | Default         | Description                                                                                                                         |
+| ------------- | ---- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| --path        | TEXT | None            | Filepath used to pre-index document store.                                                                                          |
+| --sheet-name  | TEXT | None            | If using an excel file, select which sheet(s) to load. If none provided, all sheets will be loaded. Expects a comma-separated list. |
+| --title       | TEXT | Oracle of Ammon | API documentation title.                                                                                                            |
+| --index       | TEXT | document        | Default index name.                                                                                                                 |
+| --faq         | BOOL | TRUE            | Selector for content preloaded into document store.                                                                                 |
 
-[![Image of document format](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/haystack-faq.png?raw=true)](https://docs.haystack.deepset.ai/docs/faq)
+Supported Filetypes:
+
+- FAQ: CSV, TSV, JSON, XLSX, TXT
+- Semantic: TXT
+
+See the [`data`](https://github.com/kmcleste/oracle-of-ammon/tree/main/oracle_of_ammon/data) directory for examples of accepted files.
 
 ### Locust
 
@@ -55,6 +66,7 @@ Supported filetypes: CSV, TSV, JSON, XLSX, TXT. For specific examples of each fi
 - ~~Multiple index support~~
 - Annotations/Feedback
 - Fine tuning
+- Additional locust endpoints
 - Dynamic Locust config
 - Custom pipelines
 - Dedicated docs wiki
