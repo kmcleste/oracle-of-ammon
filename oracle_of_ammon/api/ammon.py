@@ -196,6 +196,14 @@ def upload_documents(
     },
 )
 def summary(input: Index):
+    if input.is_faq:
+        if input.index not in oracle.faq_document_store.indexes.keys():
+            raise HTTPException(
+                status_code=404, detail="Selected index does not exist."
+            )
+        if oracle.faq_document_store.get_document_count() < 1:
+            raise HTTPException(status_code=404, detail="Document store is empty.")
+        return oracle.faq_document_store.describe_documents(index=input.index)
     if not input.is_faq:
         if input.index not in oracle.semantic_document_store.indexes.keys():
             raise HTTPException(
@@ -204,14 +212,6 @@ def summary(input: Index):
         if oracle.semantic_document_store.get_document_count() < 1:
             raise HTTPException(status_code=404, detail="Document store is empty.")
         return oracle.semantic_document_store.describe_documents(index=input.index)
-    else:
-        if input.index not in oracle.faq_document_store.indexes.keys():
-            raise HTTPException(
-                status_code=404, detail="Selected index does not exist."
-            )
-        if oracle.faq_document_store.get_document_count() < 1:
-            raise HTTPException(status_code=404, detail="Document store is empty.")
-        return oracle.faq_document_store.describe_documents(index=input.index)
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ To get started, checkout the help menu:
 oracle-of-ammon --help
 ```
 
-![Image of oracle-of-ammon cli help documentaiton](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/oracle-of-ammon-help.gif?raw=true)
+[![Image of oracle-of-ammon cli help documentaiton](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/oracle-of-ammon-help.gif?raw=true)](https://github.com/faressoft/terminalizer)
 
 Here, you will see we currently have two options: **summon** and **locust**.
 
