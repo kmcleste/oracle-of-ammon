@@ -51,6 +51,8 @@ Supported Filetypes:
 
 See the [`data`](https://github.com/kmcleste/oracle-of-ammon/tree/main/oracle_of_ammon/data) directory for examples of accepted files.
 
+[![Oracle of Ammon CLI - Summon](https://github.com/kmcleste/oracle-of-ammon/blob/main/images/oracle-of-ammon-summon.gif?raw=true)](https://github.com/faressoft/terminalizer)
+
 ### Locust
 
 [Locust](https://locust.io/) is an open source tool for load testing. You're able to swarm your system with millions of simultaneous users -- recording service performance and other metrics. By default, Locust will start on port 8089. To start a new load test, simply enter the number of users you want to simulate, their spawn rate, and the host address to swarm.
