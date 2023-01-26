@@ -32,6 +32,15 @@ class Documents(BaseModel):
     documents: List[Document]
 
 
+class DocumentSummary(Documents):
+    params: dict = Field(
+        {"Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}},
+        description="Search Engine node component parameters.",
+    )
+    query: str = Field(..., description="Query posed by the user.")
+    node_id: str = Field(..., description="Name of the responding node.")
+
+
 class UploadDelete(BaseModel):
     message: str = Field(..., description="Status of upload or deletion of documents.")
 

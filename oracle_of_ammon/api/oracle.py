@@ -67,7 +67,7 @@ class Oracle:
             SearchSummarizationPipeline(
                 summarizer=self.summarizer,
                 retriever=self.semantic_retriever,
-                generate_single_summary=True,
+                generate_single_summary=False,
             )
         )
 

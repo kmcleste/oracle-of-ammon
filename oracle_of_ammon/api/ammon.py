@@ -19,6 +19,7 @@ from oracle_of_ammon.api.models import (
     Documents,
     Index,
     DocumentIDs,
+    DocumentSummary,
 )
 from oracle_of_ammon.utils.logger import configure_logger
 
@@ -265,8 +266,12 @@ def delete_index(input: Index):
         return {"message": f"Successfully deleted '{input.index}' index."}
 
 
-# TODO: Create response model
-@app.post(path="/search-summarization", status_code=status.HTTP_200_OK, tags=["search"])
+@app.post(
+    path="/search-summarization",
+    status_code=status.HTTP_200_OK,
+    tags=["search"],
+    response_model=DocumentSummary,
+)
 def search_summarization(input: Search):
     return oracle.search_summarization(query=input.query, params=input.params)
 
