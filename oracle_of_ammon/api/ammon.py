@@ -2,7 +2,6 @@
 
 import logging
 import os
-import json
 
 from fastapi import FastAPI, status, UploadFile, File, HTTPException, Query
 from fastapi.responses import HTMLResponse
@@ -266,5 +265,11 @@ def delete_index(input: Index):
         return {"message": f"Successfully deleted '{input.index}' index."}
 
 
+# TODO: Create response model
+@app.post(path="/search-summarization", status_code=status.HTTP_200_OK, tags=["search"])
+def search_summarization(input: Search):
+    return oracle.search_summarization(query=input.query, params=input.params)
+
+
 if __name__ == "__main__":
-    uvicorn.run("oracle_of_ammon.api.ammon:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

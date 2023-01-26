@@ -6,8 +6,18 @@ from tempfile import SpooledTemporaryFile
 from fastapi import UploadFile
 from haystack import Answer, Document
 from haystack.document_stores import InMemoryDocumentStore
-from haystack.nodes import EmbeddingRetriever, FARMReader, PreProcessor
-from haystack.pipelines import FAQPipeline, DocumentSearchPipeline, ExtractiveQAPipeline
+from haystack.nodes import (
+    EmbeddingRetriever,
+    FARMReader,
+    PreProcessor,
+    TransformersSummarizer,
+)
+from haystack.pipelines import (
+    FAQPipeline,
+    DocumentSearchPipeline,
+    ExtractiveQAPipeline,
+    SearchSummarizationPipeline,
+)
 import pandas as pd
 
 from oracle_of_ammon.api.utils.filehandler import FileHandler
@@ -26,7 +36,7 @@ class Oracle:
             clean_whitespace=True,
             clean_header_footer=True,
             split_by="word",
-            split_length=384,
+            split_length=200,
             split_respect_sentence_boundary=True,
             split_overlap=0,
         )
@@ -44,12 +54,21 @@ class Oracle:
 
         self.reader: FARMReader = self.create_reader()
 
+        self.summarizer: TransformersSummarizer = self.create_summarizer()
+
         self.faq_pipeline: FAQPipeline = FAQPipeline(retriever=self.faq_retriever)
         self.extractive_pipeline: ExtractiveQAPipeline = ExtractiveQAPipeline(
             reader=self.reader, retriever=self.semantic_retriever
         )
         self.document_search_pipeline: DocumentSearchPipeline = DocumentSearchPipeline(
             retriever=self.semantic_retriever
+        )
+        self.search_summarization_pipeline: SearchSummarizationPipeline = (
+            SearchSummarizationPipeline(
+                summarizer=self.summarizer,
+                retriever=self.semantic_retriever,
+                generate_single_summary=True,
+            )
         )
 
         self.index_documents()
@@ -115,6 +134,22 @@ class Oracle:
             )
         except Exception as e:
             logger.error(f"Unable to create reader: {e}")
+            sys.exit(1)
+
+    def create_summarizer(self) -> TransformersSummarizer:
+        try:
+            return TransformersSummarizer(
+                model_name_or_path="facebook/bart-large-cnn",
+                tokenizer="facebook/bart-large-cnn",
+                max_length=130,
+                min_length=30,
+                use_gpu=self.use_gpu,
+                progress_bar=False,
+                generate_single_summary=False,
+            )
+        except Exception as e:
+            logger.error(f"Unable to create summarizer: {e}")
+            sys.exit(1)
 
     def index_documents(
         self,
@@ -235,6 +270,20 @@ class Oracle:
     ) -> Answer:
         try:
             return self.document_search_pipeline.run(
+                query=query, params=params, debug=False
+            )
+        except Exception as e:
+            logger.error(f"Unable to perform query: {e}")
+
+    def search_summarization(
+        self,
+        query: str,
+        params: dict = {
+            "Retriever": {"tok_k": 5, "index": os.environ.get("INDEX", "document")}
+        },
+    ):
+        try:
+            return self.search_summarization_pipeline.run(
                 query=query, params=params, debug=False
             )
         except Exception as e:
