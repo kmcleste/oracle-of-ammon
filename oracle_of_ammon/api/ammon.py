@@ -2,6 +2,7 @@
 
 import logging
 import os
+import json
 
 from fastapi import FastAPI, status, UploadFile, File, HTTPException, Query
 from fastapi.responses import HTMLResponse
@@ -13,11 +14,12 @@ from oracle_of_ammon.api.models import (
     Search,
     SearchResponse,
     HealthResponse,
-    UploadedDocuments,
+    UploadDelete,
     Summary,
     HTTPError,
     Documents,
     Index,
+    DocumentIDs,
 )
 from oracle_of_ammon.utils.logger import configure_logger
 
@@ -160,7 +162,7 @@ def get_documents(input: Index):
     path="/upload-documents",
     status_code=status.HTTP_201_CREATED,
     tags=["documents"],
-    response_model=UploadedDocuments,
+    response_model=UploadDelete,
 )
 def upload_documents(
     files: list[UploadFile] = File(..., description="List of files to be indexed."),
@@ -201,18 +203,68 @@ def summary(input: Index):
             raise HTTPException(
                 status_code=404, detail="Selected index does not exist."
             )
-        if oracle.faq_document_store.get_document_count() < 1:
-            raise HTTPException(status_code=404, detail="Document store is empty.")
         return oracle.faq_document_store.describe_documents(index=input.index)
     if not input.is_faq:
         if input.index not in oracle.semantic_document_store.indexes.keys():
             raise HTTPException(
                 status_code=404, detail="Selected index does not exist."
             )
-        if oracle.semantic_document_store.get_document_count() < 1:
-            raise HTTPException(status_code=404, detail="Document store is empty.")
         return oracle.semantic_document_store.describe_documents(index=input.index)
 
 
+@app.delete(
+    path="/delete-documents",
+    status_code=status.HTTP_200_OK,
+    tags=["documents"],
+    response_model=UploadDelete,
+)
+def delete_documents(input: DocumentIDs):
+    if input.is_faq:
+        oracle.faq_document_store.delete_documents(index=input.index, ids=input.ids)
+        oracle.faq_document_store.update_embeddings(
+            retriever=oracle.faq_retriever,
+            index=input.index,
+            update_existing_embeddings=False,
+        )
+        return {"message": f"Successfully deleted: {input.ids}"}
+    if not input.is_faq:
+        oracle.semantic_document_store.delete_documents(
+            index=input.index, ids=input.ids
+        )
+        oracle.semantic_document_store.update_embeddings(
+            retriever=oracle.semantic_retriever, index=input.index
+        )
+        return {"message": f"Successfully deleted: {input.ids}"}
+
+
+@app.delete(
+    path="/delete-index",
+    status_code=status.HTTP_200_OK,
+    tags=["documents"],
+    responses={
+        200: {"model": UploadDelete},
+        404: {
+            "model": HTTPError,
+            "description": "Returned when document store is empty.",
+        },
+    },
+)
+def delete_index(input: Index):
+    if input.is_faq:
+        if input.index not in oracle.faq_document_store.indexes.keys():
+            raise HTTPException(
+                status_code=404, detail="Selected index does not exist."
+            )
+        oracle.faq_document_store.delete_index(index=input.index)
+        return {"message": f"Successfully deleted '{input.index}' index."}
+    if not input.is_faq:
+        if input.index not in oracle.semantic_document_store.indexes.keys():
+            raise HTTPException(
+                status_code=404, detail="Selected index does not exist."
+            )
+        oracle.semantic_document_store.delete_index(index=input.index)
+        return {"message": f"Successfully deleted '{input.index}' index."}
+
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("oracle_of_ammon.api.ammon:app", host="0.0.0.0", port=8000, reload=True)

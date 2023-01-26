@@ -32,8 +32,12 @@ class Documents(BaseModel):
     documents: List[Document]
 
 
-class UploadedDocuments(BaseModel):
-    message: str = Field(..., description="Status of file upload.")
+class UploadDelete(BaseModel):
+    message: str = Field(..., description="Status of upload or deletion of documents.")
+
+
+class DocumentIDs(Index):
+    ids: list[str] = Field(..., description="List of document IDs to be selected.`")
 
 
 class Summary(BaseModel):
