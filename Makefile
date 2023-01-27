@@ -16,3 +16,6 @@ cicd: black bandit test
 
 serve:
 	poetry run mkdocs serve
+
+deploy-docs:
+	poetry run mkdocs gh-deploy

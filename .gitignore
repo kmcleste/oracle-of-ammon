@@ -5,3 +5,6 @@ logs/
 .pytest_cache
 *.ipynb
 dist/
+
+# mkdocs documentation
+/site
