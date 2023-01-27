@@ -1,7 +1,8 @@
 # Oracle of Ammon
 
-[![PyPI version shield](https://img.shields.io/pypi/v/oracle-of-ammon?style=flat-square)](https://pypi.org/project/oracle-of-ammon/)
-[![Python version shield](https://img.shields.io/pypi/pyversions/oracle-of-ammon?style=flat-square)](https://pypi.org/project/oracle-of-ammon/)
+[![PyPI version shield](https://img.shields.io/pypi/v/oracle-of-ammon?color=blue&style=flat-square)](https://pypi.org/project/oracle-of-ammon/)
+[![Python version shield](https://img.shields.io/pypi/pyversions/oracle-of-ammon?color=blue&style=flat-square)](https://pypi.org/project/oracle-of-ammon/)
+[![MIT License](https://img.shields.io/github/license/kmcleste/oracle-of-ammon?style=flat-square)](https://github.com/kmcleste/oracle-of-ammon/blob/main/LICENSE)
 
 A simple CLI tool for creating Search APIs.
 

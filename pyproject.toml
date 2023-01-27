@@ -10,8 +10,13 @@ repository = "https://github.com/kmcleste/oracle-of-ammon"
 keywords = ["fastapi", "haystack", "search", "faq", "typer"]
 include = ["LICENSE"]
 classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Langauge :: Python",
     "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent"
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
 ]
 packages = [{include = "oracle_of_ammon"}]
 
@@ -41,6 +46,9 @@ ipywidgets = "^8.0.4"
 httpx = "^0.23.1"
 bandit = {extras = ["toml"], version = "^1.7.4"}
 locust = "^2.14.0"
+mkdocs = "^1.4.2"
+mkdocs-material = "^9.0.6"
+mkdocstrings = "^0.20.0"
 
 [tool.poetry.scripts]
 oracle-of-ammon = "oracle_of_ammon.cli.main:app"

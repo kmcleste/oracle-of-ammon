@@ -13,3 +13,6 @@ test:
 	poetry run pytest
 
 cicd: black bandit test
+
+serve:
+	poetry run mkdocs serve
