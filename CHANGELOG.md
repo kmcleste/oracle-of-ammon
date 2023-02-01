@@ -1,3 +1,9 @@
+## v0.2.1 (2023-01-31)
+
+### Fix
+
+- remove bad pypi classifier
+
 ## v0.2.0 (2023-01-31)
 
 ### Feat
