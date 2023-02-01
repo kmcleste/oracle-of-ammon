@@ -8,6 +8,7 @@ import uvicorn
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import HTMLResponse
 
+from oracle_of_ammon.__version__ import __version__
 from oracle_of_ammon.api.health import get_health_status
 from oracle_of_ammon.api.models import (
     DocumentIDs,
@@ -27,7 +28,7 @@ from oracle_of_ammon.utils.logger import configure_logger
 logger: logging.Logger = configure_logger()
 
 
-app = FastAPI(title=os.environ.get("API_TITLE", "Oracle of Ammon"), version="0.1.6")
+app = FastAPI(title=os.environ.get("API_TITLE", "Oracle of Ammon"), version=__version__)
 
 oracle = Oracle()
 
