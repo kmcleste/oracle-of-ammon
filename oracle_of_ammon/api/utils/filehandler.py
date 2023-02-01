@@ -31,7 +31,7 @@ class FileHandler:
         preprocessor: PreProcessor,
         filepath_or_buffer: Union[SpooledTemporaryFile, str],
         filename: Union[str, None] = None,
-    ) -> list[Document]:
+    ) -> List[Document]:
         try:
             if isinstance(filepath_or_buffer, SpooledTemporaryFile):
                 try:
