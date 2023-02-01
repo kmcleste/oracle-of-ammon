@@ -3,6 +3,7 @@ import os
 import sys
 from tempfile import SpooledTemporaryFile
 
+import pandas as pd
 from fastapi import UploadFile
 from haystack import Answer, Document
 from haystack.document_stores import InMemoryDocumentStore
@@ -13,12 +14,11 @@ from haystack.nodes import (
     TransformersSummarizer,
 )
 from haystack.pipelines import (
-    FAQPipeline,
     DocumentSearchPipeline,
     ExtractiveQAPipeline,
+    FAQPipeline,
     SearchSummarizationPipeline,
 )
-import pandas as pd
 
 from oracle_of_ammon.api.utils.filehandler import FileHandler
 from oracle_of_ammon.utils.logger import configure_logger
@@ -63,12 +63,10 @@ class Oracle:
         self.document_search_pipeline: DocumentSearchPipeline = DocumentSearchPipeline(
             retriever=self.semantic_retriever
         )
-        self.search_summarization_pipeline: SearchSummarizationPipeline = (
-            SearchSummarizationPipeline(
-                summarizer=self.summarizer,
-                retriever=self.semantic_retriever,
-                generate_single_summary=False,
-            )
+        self.search_summarization_pipeline: SearchSummarizationPipeline = SearchSummarizationPipeline(
+            summarizer=self.summarizer,
+            retriever=self.semantic_retriever,
+            generate_single_summary=False,
         )
 
         self.index_documents()
@@ -153,17 +151,14 @@ class Oracle:
 
     def index_documents(
         self,
-        filepath_or_buffer: SpooledTemporaryFile
-        | str = os.environ.get("OASIS_OF_SIWA", None),
+        filepath_or_buffer: SpooledTemporaryFile | str = os.environ.get("OASIS_OF_SIWA", None),
         filename: str | None = None,
         index: str = os.environ.get("INDEX", "document"),
         **kwargs,
     ) -> None:
         is_faq = os.environ.get("IS_FAQ") == "True"
         if kwargs.get("is_faq", is_faq) and filepath_or_buffer:
-            SHEET_NAME: str = kwargs.get(
-                "sheet_name", os.environ.get("SHEET_NAME", None)
-            )
+            SHEET_NAME: str = kwargs.get("sheet_name", os.environ.get("SHEET_NAME", None))
 
             if SHEET_NAME is not None and filepath_or_buffer is None:
                 logger.warning("A sheet name was provided but no excel file selected.")
@@ -181,16 +176,12 @@ class Oracle:
                 logger.debug("Indexing documents...")
 
                 questions = list(df["question"].values)
-                df["question_emb"] = self.faq_retriever.embed_queries(
-                    queries=questions
-                ).tolist()
+                df["question_emb"] = self.faq_retriever.embed_queries(queries=questions).tolist()
                 df = df.rename(columns={"question": "content"})
 
                 try:
                     docs_to_index = df.to_dict(orient="records")
-                    self.faq_document_store.write_documents(
-                        docs_to_index, duplicate_documents="skip", index=index
-                    )
+                    self.faq_document_store.write_documents(docs_to_index, duplicate_documents="skip", index=index)
 
                 except Exception as e:
                     logger.warning(f"Unable to write documents to document store: {e}")
@@ -200,9 +191,7 @@ class Oracle:
                 filepath_or_buffer=filepath_or_buffer,
                 filename=filename,
             )
-            self.semantic_document_store.write_documents(
-                documents=documents, index=index, duplicate_documents="skip"
-            )
+            self.semantic_document_store.write_documents(documents=documents, index=index, duplicate_documents="skip")
             self.semantic_document_store.update_embeddings(
                 retriever=self.semantic_retriever,
                 index=index,
@@ -239,9 +228,7 @@ class Oracle:
     def faq_search(
         self,
         query: str,
-        params: dict = {
-            "Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}
-        },
+        params: dict = {"Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}},
     ) -> Answer:
         try:
             return self.faq_pipeline.run(query=query, params=params, debug=False)
@@ -264,27 +251,19 @@ class Oracle:
     def document_search(
         self,
         query: str,
-        params: dict = {
-            "Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}
-        },
+        params: dict = {"Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}},
     ) -> Answer:
         try:
-            return self.document_search_pipeline.run(
-                query=query, params=params, debug=False
-            )
+            return self.document_search_pipeline.run(query=query, params=params, debug=False)
         except Exception as e:
             logger.error(f"Unable to perform query: {e}")
 
     def search_summarization(
         self,
         query: str,
-        params: dict = {
-            "Retriever": {"tok_k": 5, "index": os.environ.get("INDEX", "document")}
-        },
+        params: dict = {"Retriever": {"tok_k": 5, "index": os.environ.get("INDEX", "document")}},
     ):
         try:
-            return self.search_summarization_pipeline.run(
-                query=query, params=params, debug=False
-            )
+            return self.search_summarization_pipeline.run(query=query, params=params, debug=False)
         except Exception as e:
             logger.error(f"Unable to perform query: {e}")

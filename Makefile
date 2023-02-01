@@ -14,8 +14,17 @@ test:
 
 cicd: black bandit test
 
+pre-commit:
+	poetry run pre-commit run --all-files
+
 serve:
 	poetry run mkdocs serve
 
 deploy-docs:
 	poetry run mkdocs gh-deploy
+
+build:
+	poetry build
+
+bump: build
+	poetry run cz bump --changelog

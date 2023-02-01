@@ -10,7 +10,6 @@ from haystack.nodes import PreProcessor
 
 from oracle_of_ammon.utils.logger import configure_logger
 
-
 logger: logging.Logger = configure_logger()
 
 
@@ -54,9 +53,7 @@ class FileHandler:
                     "filename": filename,
                 }
 
-                doc: Document = preprocessor.process(
-                    Document(content=content, meta=meta)
-                )
+                doc: Document = preprocessor.process(Document(content=content, meta=meta))
 
                 return doc
 
@@ -111,9 +108,7 @@ class FileHandler:
             cls.file_clean_up(path=path)
 
     @classmethod
-    def read_excel(
-        cls, path: str | pathlib.Path, sheet_name: list[str] | None = None
-    ) -> pd.DataFrame:
+    def read_excel(cls, path: str | pathlib.Path, sheet_name: list[str] | None = None) -> pd.DataFrame:
         try:
             xls = pd.ExcelFile(path_or_buffer=path, engine="openpyxl")
             df: dict[pd.DataFrame] = xls.parse(sheet_name=sheet_name)
@@ -142,9 +137,7 @@ class FileHandler:
                         parsed = [word.strip() for word in line.split("|")]
                         questions.append(parsed[0])
                         answers.append(parsed[1])
-            return pd.DataFrame(
-                data=zip(questions, answers), columns=["question", "answer"]
-            )
+            return pd.DataFrame(data=zip(questions, answers), columns=["question", "answer"])
         except Exception as e:
             logger.error(f"Unable to convert text file to DataFrame: {e}")
         finally:
@@ -169,9 +162,7 @@ class FileHandler:
 
         try:
             if not isinstance(data, list):
-                raise TypeError(
-                    "Data should consist of a list of dictionaries. No list found."
-                )
+                raise TypeError("Data should consist of a list of dictionaries. No list found.")
             else:
                 questions: list = []
                 answers: list = []
@@ -180,9 +171,7 @@ class FileHandler:
                     questions.append(element.get("question"))
                     answers.append(element.get("answer"))
 
-            return pd.DataFrame(
-                data=zip(questions, answers), columns=["question", "answer"]
-            )
+            return pd.DataFrame(data=zip(questions, answers), columns=["question", "answer"])
         except Exception as e:
             logger.error(f"Unable to convert JSON to DataFrame: {e}")
         finally:

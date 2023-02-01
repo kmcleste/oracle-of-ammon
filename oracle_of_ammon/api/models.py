@@ -23,9 +23,7 @@ class Search(BaseModel):
 
 class SearchResponse(BaseModel):
     query: str = Field(..., description="Query posed by the user.")
-    answers: List[Answer] = Field(
-        ..., description="List of answers in descending order by relevance score."
-    )
+    answers: List[Answer] = Field(..., description="List of answers in descending order by relevance score.")
 
 
 class Documents(BaseModel):
@@ -51,24 +49,14 @@ class DocumentIDs(Index):
 
 class Summary(BaseModel):
     count: int = Field(..., description="Count of documents in an index.")
-    chars_mean: float = Field(
-        ..., description="Mean characters across all documents in an index."
-    )
-    chars_max: int = Field(
-        ..., description="Maximum characters in any 1 document across an index.."
-    )
-    chars_min: int = Field(
-        ..., description="Minimum characters in any 1 document across an index."
-    )
-    chars_median: int = Field(
-        ..., description="Median characters across all documents in an index."
-    )
+    chars_mean: float = Field(..., description="Mean characters across all documents in an index.")
+    chars_max: int = Field(..., description="Maximum characters in any 1 document across an index..")
+    chars_min: int = Field(..., description="Minimum characters in any 1 document across an index.")
+    chars_median: int = Field(..., description="Median characters across all documents in an index.")
 
 
 class HTTPError(BaseModel):
-    detail: str = Field(
-        ..., description="Message explaining the reason for HTTPException."
-    )
+    detail: str = Field(..., description="Message explaining the reason for HTTPException.")
 
     class Config:
         schema_extra = {"example": {"detail": "HTTPException raised."}}
@@ -95,9 +83,7 @@ class MemoryUsage(BaseModel):
 class GPUUsage(BaseModel):
     kernel_usage: float = Field(..., description="GPU kernel usage in percentage.")
     memory_total: int = Field(..., description="Total GPU memory in megabytes.")
-    memory_used: Optional[int] = Field(
-        ..., description="REST API used GPU memory in megabytes."
-    )
+    memory_used: Optional[int] = Field(..., description="REST API used GPU memory in megabytes.")
 
     @validator("kernel_usage")
     @classmethod

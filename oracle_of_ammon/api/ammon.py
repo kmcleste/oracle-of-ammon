@@ -3,24 +3,24 @@
 import logging
 import os
 
-from fastapi import FastAPI, status, UploadFile, File, HTTPException, Query
-from fastapi.responses import HTMLResponse
 import uvicorn
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import HTMLResponse
 
-from oracle_of_ammon.api.oracle import Oracle
 from oracle_of_ammon.api.health import get_health_status
 from oracle_of_ammon.api.models import (
+    DocumentIDs,
+    Documents,
+    DocumentSummary,
+    HealthResponse,
+    HTTPError,
+    Index,
     Search,
     SearchResponse,
-    HealthResponse,
-    UploadDelete,
     Summary,
-    HTTPError,
-    Documents,
-    Index,
-    DocumentIDs,
-    DocumentSummary,
+    UploadDelete,
 )
+from oracle_of_ammon.api.oracle import Oracle
 from oracle_of_ammon.utils.logger import configure_logger
 
 logger: logging.Logger = configure_logger()
@@ -145,16 +145,10 @@ def health():
 )
 def get_documents(input: Index):
     if input.is_faq:
-        return {
-            "documents": oracle.faq_document_store.get_all_documents(
-                index=input.index, return_embedding=False
-            )
-        }
+        return {"documents": oracle.faq_document_store.get_all_documents(index=input.index, return_embedding=False)}
     else:
         return {
-            "documents": oracle.semantic_document_store.get_all_documents(
-                index=input.index, return_embedding=False
-            )
+            "documents": oracle.semantic_document_store.get_all_documents(index=input.index, return_embedding=False)
         }
 
 
@@ -180,9 +174,7 @@ def upload_documents(
         description="Which document store to access.",
     ),
 ):
-    return oracle.upload_documents(
-        files=files, index=index, **{"sheet_name": sheet_name, "is_faq": is_faq}
-    )
+    return oracle.upload_documents(files=files, index=index, **{"sheet_name": sheet_name, "is_faq": is_faq})
 
 
 @app.post(
@@ -200,15 +192,11 @@ def upload_documents(
 def summary(input: Index):
     if input.is_faq:
         if input.index not in oracle.faq_document_store.indexes.keys():
-            raise HTTPException(
-                status_code=404, detail="Selected index does not exist."
-            )
+            raise HTTPException(status_code=404, detail="Selected index does not exist.")
         return oracle.faq_document_store.describe_documents(index=input.index)
     if not input.is_faq:
         if input.index not in oracle.semantic_document_store.indexes.keys():
-            raise HTTPException(
-                status_code=404, detail="Selected index does not exist."
-            )
+            raise HTTPException(status_code=404, detail="Selected index does not exist.")
         return oracle.semantic_document_store.describe_documents(index=input.index)
 
 
@@ -228,12 +216,8 @@ def delete_documents(input: DocumentIDs):
         )
         return {"message": f"Successfully deleted: {input.ids}"}
     if not input.is_faq:
-        oracle.semantic_document_store.delete_documents(
-            index=input.index, ids=input.ids
-        )
-        oracle.semantic_document_store.update_embeddings(
-            retriever=oracle.semantic_retriever, index=input.index
-        )
+        oracle.semantic_document_store.delete_documents(index=input.index, ids=input.ids)
+        oracle.semantic_document_store.update_embeddings(retriever=oracle.semantic_retriever, index=input.index)
         return {"message": f"Successfully deleted: {input.ids}"}
 
 
@@ -252,16 +236,12 @@ def delete_documents(input: DocumentIDs):
 def delete_index(input: Index):
     if input.is_faq:
         if input.index not in oracle.faq_document_store.indexes.keys():
-            raise HTTPException(
-                status_code=404, detail="Selected index does not exist."
-            )
+            raise HTTPException(status_code=404, detail="Selected index does not exist.")
         oracle.faq_document_store.delete_index(index=input.index)
         return {"message": f"Successfully deleted '{input.index}' index."}
     if not input.is_faq:
         if input.index not in oracle.semantic_document_store.indexes.keys():
-            raise HTTPException(
-                status_code=404, detail="Selected index does not exist."
-            )
+            raise HTTPException(status_code=404, detail="Selected index does not exist.")
         oracle.semantic_document_store.delete_index(index=input.index)
         return {"message": f"Successfully deleted '{input.index}' index."}
 
