@@ -70,9 +70,9 @@ filterwarnings = [
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "1.5.1"
-tag_format = "$version"
-version_files = ["pyproject.toml:version"]
+version = "0.1.6"
+tag_format = "v$version"
+version_files = ["pyproject.toml:version", "oracle_of_ammon/__version__.py"]
 update_changelog_on_bump = true
 
 [tool.black]
