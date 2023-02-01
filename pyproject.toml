@@ -5,7 +5,7 @@ description = "CLI tool for creating Search APIs."
 authors = ["Kyle McLester <kyle.mclester@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/kmcleste/oracle-of-ammon"
+homepage = "https://kmcleste.github.io/oracle-of-ammon/"
 repository = "https://github.com/kmcleste/oracle-of-ammon"
 keywords = ["fastapi", "haystack", "search", "faq", "typer"]
 include = ["LICENSE"]
@@ -33,6 +33,7 @@ python-multipart = "^0.0.5"
 farm-haystack = "^1.12.2"
 psutil = "^5.9.4"
 openpyxl = "^3.0.10"
+types-psutil = "^5.9.5.6"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -49,6 +50,11 @@ locust = "^2.14.0"
 mkdocs = "^1.4.2"
 mkdocs-material = "^9.0.6"
 mkdocstrings = "^0.20.0"
+commitizen = "^2.40.0"
+autoflake = "^2.0.1"
+isort = "^5.12.0"
+mkdocstrings-python = "^0.8.3"
+pyupgrade = "^3.3.1"
 
 [tool.poetry.scripts]
 oracle-of-ammon = "oracle_of_ammon.cli.main:app"
@@ -62,5 +68,21 @@ filterwarnings = [
     "ignore::DeprecationWarning"
 ]
 
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "1.5.1"
+tag_format = "$version"
+version_files = ["pyproject.toml:version"]
+update_changelog_on_bump = true
+
+[tool.black]
+line-length = 120
+target-version = ["py38", "py39", "py310"]
+include = '\.pyi?'
+
 [tool.bandit]
 skips = ["B101", "B104", "B501", "B603", "B607"]
+
+[tool.isort]
+profile = "black"
+src_paths = ["oracle_of_ammon"]

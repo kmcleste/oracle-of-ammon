@@ -1,13 +1,12 @@
 import logging
 import os
-import pynvml
-import psutil
 from typing import List
 
 import haystack
+import psutil
+import pynvml
 
-from oracle_of_ammon.api.models import CPUUsage, MemoryUsage, GPUUsage, GPUInfo
-
+from oracle_of_ammon.api.models import CPUUsage, GPUInfo, GPUUsage, MemoryUsage
 from oracle_of_ammon.utils.logger import configure_logger
 
 logger: logging.Logger = configure_logger()
@@ -37,9 +36,7 @@ def get_health_status():
                 usage=GPUUsage(
                     memory_total=round(gpu_mem_total),
                     kernel_usage=pynvml.nvmlDeviceGetUtilizationRates(handle).gpu,
-                    memory_used=round(gpu_mem_used)
-                    if gpu_mem_used is not None
-                    else None,
+                    memory_used=round(gpu_mem_used) if gpu_mem_used is not None else None,
                 ),
             )
 

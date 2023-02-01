@@ -3,13 +3,13 @@ import logging
 import os
 import pathlib
 from tempfile import SpooledTemporaryFile, tempdir
+from typing import List, Union
 
 import pandas as pd
 from haystack import Document
 from haystack.nodes import PreProcessor
 
 from oracle_of_ammon.utils.logger import configure_logger
-
 
 logger: logging.Logger = configure_logger()
 
@@ -29,9 +29,9 @@ class FileHandler:
     def read_documents(
         cls,
         preprocessor: PreProcessor,
-        filepath_or_buffer: SpooledTemporaryFile | str,
-        filename: str | None = None,
-    ) -> list[Document]:
+        filepath_or_buffer: Union[SpooledTemporaryFile, str],
+        filename: Union[str, None] = None,
+    ) -> List[Document]:
         try:
             if isinstance(filepath_or_buffer, SpooledTemporaryFile):
                 try:
@@ -46,7 +46,7 @@ class FileHandler:
                 path = filepath_or_buffer
 
             try:
-                with open(file=path, mode="r") as f:
+                with open(file=path) as f:
                     content = f.read()
 
                 meta: dict = {
@@ -54,9 +54,7 @@ class FileHandler:
                     "filename": filename,
                 }
 
-                doc: Document = preprocessor.process(
-                    Document(content=content, meta=meta)
-                )
+                doc: Document = preprocessor.process(Document(content=content, meta=meta))
 
                 return doc
 
@@ -69,8 +67,8 @@ class FileHandler:
     @classmethod
     def read_faq(
         cls,
-        filepath_or_buffer: SpooledTemporaryFile | str,
-        filename: str | None = None,
+        filepath_or_buffer: Union[SpooledTemporaryFile, str],
+        filename: Union[str, None] = None,
         **kwargs,
     ) -> pd.DataFrame:
         try:
@@ -102,7 +100,7 @@ class FileHandler:
             logger.error(f"Unable to read file: {e}")
 
     @classmethod
-    def read_csv(cls, path: str | pathlib.Path) -> pd.DataFrame:
+    def read_csv(cls, path: Union[str, pathlib.Path]) -> pd.DataFrame:
         try:
             return pd.read_csv(filepath_or_buffer=path)
         except Exception as e:
@@ -111,9 +109,7 @@ class FileHandler:
             cls.file_clean_up(path=path)
 
     @classmethod
-    def read_excel(
-        cls, path: str | pathlib.Path, sheet_name: list[str] | None = None
-    ) -> pd.DataFrame:
+    def read_excel(cls, path: Union[str, pathlib.Path], sheet_name: Union[List[str], None] = None) -> pd.DataFrame:
         try:
             xls = pd.ExcelFile(path_or_buffer=path, engine="openpyxl")
             df: dict[pd.DataFrame] = xls.parse(sheet_name=sheet_name)
@@ -132,26 +128,24 @@ class FileHandler:
             cls.file_clean_up(path=path)
 
     @classmethod
-    def read_text(cls, path: str | pathlib.Path) -> pd.DataFrame:
+    def read_text(cls, path: Union[str, pathlib.Path]) -> pd.DataFrame:
         questions: list = []
         answers: list = []
         try:
-            with open(path, "r") as f:
+            with open(path) as f:
                 for idx, line in enumerate(f):
                     if not idx == 0:
                         parsed = [word.strip() for word in line.split("|")]
                         questions.append(parsed[0])
                         answers.append(parsed[1])
-            return pd.DataFrame(
-                data=zip(questions, answers), columns=["question", "answer"]
-            )
+            return pd.DataFrame(data=zip(questions, answers), columns=["question", "answer"])
         except Exception as e:
             logger.error(f"Unable to convert text file to DataFrame: {e}")
         finally:
             cls.file_clean_up(path=path)
 
     @classmethod
-    def read_tsv(cls, path: str | pathlib.Path) -> pd.DataFrame:
+    def read_tsv(cls, path: Union[str, pathlib.Path]) -> pd.DataFrame:
         try:
             return pd.read_csv(filepath_or_buffer=path, sep="\t")
         except Exception as e:
@@ -160,18 +154,16 @@ class FileHandler:
             cls.file_clean_up(path=path)
 
     @classmethod
-    def read_json(cls, path: str | pathlib.Path) -> pd.DataFrame:
+    def read_json(cls, path: Union[str, pathlib.Path]) -> pd.DataFrame:
         try:
-            with open(path, "r") as f:
+            with open(path) as f:
                 data = json.load(f)
         except Exception as e:
             logger.error(f"Unable to load JSON file: {e}")
 
         try:
             if not isinstance(data, list):
-                raise TypeError(
-                    "Data should consist of a list of dictionaries. No list found."
-                )
+                raise TypeError("Data should consist of a list of dictionaries. No list found.")
             else:
                 questions: list = []
                 answers: list = []
@@ -180,9 +172,7 @@ class FileHandler:
                     questions.append(element.get("question"))
                     answers.append(element.get("answer"))
 
-            return pd.DataFrame(
-                data=zip(questions, answers), columns=["question", "answer"]
-            )
+            return pd.DataFrame(data=zip(questions, answers), columns=["question", "answer"])
         except Exception as e:
             logger.error(f"Unable to convert JSON to DataFrame: {e}")
         finally:
