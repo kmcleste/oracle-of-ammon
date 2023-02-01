@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 from tempfile import SpooledTemporaryFile
+from typing import List, Union
 
 import pandas as pd
 from fastapi import UploadFile
@@ -151,8 +152,8 @@ class Oracle:
 
     def index_documents(
         self,
-        filepath_or_buffer: SpooledTemporaryFile | str = os.environ.get("OASIS_OF_SIWA", None),
-        filename: str | None = None,
+        filepath_or_buffer: Union[SpooledTemporaryFile, str] = os.environ.get("OASIS_OF_SIWA", None),
+        filename: Union[str, None] = None,
         index: str = os.environ.get("INDEX", "document"),
         **kwargs,
     ) -> None:
@@ -186,7 +187,7 @@ class Oracle:
                 except Exception as e:
                     logger.warning(f"Unable to write documents to document store: {e}")
         elif not kwargs.get("is_faq", is_faq) and filepath_or_buffer:
-            documents: list[Document] = FileHandler.read_documents(
+            documents: List[Document] = FileHandler.read_documents(
                 preprocessor=self.preprocessor,
                 filepath_or_buffer=filepath_or_buffer,
                 filename=filename,
@@ -202,7 +203,7 @@ class Oracle:
 
     def upload_documents(
         self,
-        files: list[UploadFile],
+        files: List[UploadFile],
         index: str = os.environ.get("INDEX", "document"),
         **kwargs,
     ) -> dict:

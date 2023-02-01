@@ -2,6 +2,7 @@
 
 import logging
 import os
+from typing import List, Union
 
 import uvicorn
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile, status
@@ -159,13 +160,12 @@ def get_documents(input: Index):
     response_model=UploadDelete,
 )
 def upload_documents(
-    files: list[UploadFile] = File(..., description="List of files to be indexed."),
+    files: List[UploadFile] = File(..., description="List of files to be indexed."),
     index: str = Query(
         default=os.environ.get("INDEX", "document"),
         description="Name of the desired index.",
     ),
-    sheet_name: str
-    | None = Query(
+    sheet_name: Union[str, None] = Query(
         "sheet_name",
         description="The sheet name(s) to index when uploading an XLSX file. Expects comma-separated string.",
     ),

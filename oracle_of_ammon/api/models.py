@@ -44,7 +44,7 @@ class UploadDelete(BaseModel):
 
 
 class DocumentIDs(Index):
-    ids: list[str] = Field(..., description="List of document IDs to be selected.`")
+    ids: List[str] = Field(..., description="List of document IDs to be selected.`")
 
 
 class Summary(BaseModel):
