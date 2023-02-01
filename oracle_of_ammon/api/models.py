@@ -67,7 +67,7 @@ class CPUUsage(BaseModel):
 
     @validator("used")
     @classmethod
-    def used_check(cls, v):
+    def used_check(cls, v) -> float:
         return round(v, 2)
 
 
@@ -76,7 +76,7 @@ class MemoryUsage(BaseModel):
 
     @validator("used")
     @classmethod
-    def used_check(cls, v):
+    def used_check(cls, v) -> float:
         return round(v, 2)
 
 
@@ -87,7 +87,7 @@ class GPUUsage(BaseModel):
 
     @validator("kernel_usage")
     @classmethod
-    def kernel_usage_check(cls, v):
+    def kernel_usage_check(cls, v) -> float:
         return round(v, 2)
 
 

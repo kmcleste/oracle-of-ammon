@@ -45,7 +45,7 @@ class FileHandler:
                 path = filepath_or_buffer
 
             try:
-                with open(file=path, mode="r") as f:
+                with open(file=path) as f:
                     content = f.read()
 
                 meta: dict = {
@@ -131,7 +131,7 @@ class FileHandler:
         questions: list = []
         answers: list = []
         try:
-            with open(path, "r") as f:
+            with open(path) as f:
                 for idx, line in enumerate(f):
                     if not idx == 0:
                         parsed = [word.strip() for word in line.split("|")]
@@ -155,7 +155,7 @@ class FileHandler:
     @classmethod
     def read_json(cls, path: str | pathlib.Path) -> pd.DataFrame:
         try:
-            with open(path, "r") as f:
+            with open(path) as f:
                 data = json.load(f)
         except Exception as e:
             logger.error(f"Unable to load JSON file: {e}")

@@ -6,9 +6,9 @@ class Tests(HttpUser):
     wait_time = between(2, 4)
 
     @task
-    def health(self):
+    def health(self) -> None:
         self.client.get(url="/health")
 
     @task
-    def root(self):
+    def root(self) -> None:
         self.client.get(url="/")

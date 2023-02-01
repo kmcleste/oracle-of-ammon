@@ -2,7 +2,7 @@ import logging
 import os
 import pathlib
 import subprocess  # nosec
-from typing import List, Union
+from typing import Union
 
 import typer
 
