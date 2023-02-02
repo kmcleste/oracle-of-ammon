@@ -9,6 +9,7 @@ from fastapi import UploadFile
 from haystack import Answer, Document
 from haystack.document_stores import InMemoryDocumentStore
 from haystack.nodes import (
+    DocumentMerger,
     EmbeddingRetriever,
     FARMReader,
     PreProcessor,
@@ -18,6 +19,7 @@ from haystack.pipelines import (
     DocumentSearchPipeline,
     ExtractiveQAPipeline,
     FAQPipeline,
+    Pipeline,
     SearchSummarizationPipeline,
 )
 
@@ -57,6 +59,8 @@ class Oracle:
 
         self.summarizer: TransformersSummarizer = self.create_summarizer()
 
+        self.document_merger: DocumentMerger = self.create_document_merger()
+
         self.faq_pipeline: FAQPipeline = FAQPipeline(retriever=self.faq_retriever)
         self.extractive_pipeline: ExtractiveQAPipeline = ExtractiveQAPipeline(
             reader=self.reader, retriever=self.semantic_retriever
@@ -69,6 +73,7 @@ class Oracle:
             retriever=self.semantic_retriever,
             generate_single_summary=False,
         )
+        self.span_summarizaer_pipeline: Pipeline = self.create_span_summarizer_pipeline()
 
         self.index_documents()
 
@@ -94,7 +99,7 @@ class Oracle:
             return faq, semantic
 
         except Exception as e:
-            logger.error(f"Unable to create document store: {e}")
+            logger.critical(f"Unable to create document store: {e}")
             sys.exit(1)
 
     def create_retriever(self) -> EmbeddingRetriever:
@@ -119,7 +124,7 @@ class Oracle:
             return faq, semantic
 
         except Exception as e:
-            logger.error(f"Unable to create retriever: {e}")
+            logger.critical(f"Unable to create retriever: {e}")
             sys.exit(1)
 
     def create_reader(self) -> FARMReader:
@@ -132,7 +137,7 @@ class Oracle:
                 batch_size=96,
             )
         except Exception as e:
-            logger.error(f"Unable to create reader: {e}")
+            logger.critical(f"Unable to create reader: {e}")
             sys.exit(1)
 
     def create_summarizer(self) -> TransformersSummarizer:
@@ -140,14 +145,33 @@ class Oracle:
             return TransformersSummarizer(
                 model_name_or_path="facebook/bart-large-cnn",
                 tokenizer="facebook/bart-large-cnn",
-                max_length=130,
+                max_length=250,
                 min_length=30,
                 use_gpu=self.use_gpu,
                 progress_bar=False,
                 generate_single_summary=False,
             )
         except Exception as e:
-            logger.error(f"Unable to create summarizer: {e}")
+            logger.critical(f"Unable to create summarizer: {e}")
+            sys.exit(1)
+
+    def create_document_merger(self) -> DocumentMerger:
+        try:
+            return DocumentMerger(separator=" ")
+        except Exception as e:
+            logger.critical(f"Unable to create document merger: {e}")
+            sys.exit(1)
+
+    def create_span_summarizer_pipeline(self) -> Pipeline:
+        try:
+            pipeline: Pipeline = Pipeline()
+            pipeline.add_node(component=self.semantic_retriever, name="Retriever", inputs=["Query"])
+            pipeline.add_node(component=self.document_merger, name="DocumentMerger", inputs=["Retriever"])
+            pipeline.add_node(component=self.summarizer, name="Summarizer", inputs=["DocumentMerger"])
+
+            return pipeline
+        except Exception as e:
+            logger.critical(f"Unable to create span summarizer pipeline: {e}")
             sys.exit(1)
 
     def index_documents(
@@ -266,5 +290,28 @@ class Oracle:
     ):
         try:
             return self.search_summarization_pipeline.run(query=query, params=params, debug=False)
+        except Exception as e:
+            logger.error(f"Unable to perform query: {e}")
+
+    def document_summzarization(self, files: List[UploadFile]) -> dict:
+        resp: list = []
+        for file in files:
+            try:
+                doc = FileHandler.read_documents(
+                    preprocessor=self.preprocessor, filepath_or_buffer=file.file, filename=file.filename
+                )
+                summary = self.summarizer.predict(documents=doc, generate_single_summary=False)
+                resp.append(summary)
+            except Exception as e:
+                logger.error(f"Unable to summarize {file.filename}: {e}")
+        flat_resp: List[Document] = [item for sublist in resp for item in sublist]
+
+        return {"documents": flat_resp}
+
+    def search_span_summarization(
+        self, query: str, params: dict = {"Retriever": {"top_k": 5, "index": os.environ.get("INDEX", "document")}}
+    ):
+        try:
+            return self.span_summarizaer_pipeline.run(query=query, params=params, debug=False)
         except Exception as e:
             logger.error(f"Unable to perform query: {e}")

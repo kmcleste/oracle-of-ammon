@@ -30,7 +30,7 @@ class Documents(BaseModel):
     documents: List[Document]
 
 
-class DocumentSummary(Documents):
+class SearchSummary(Documents):
     params: dict = Field(
         {"Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}},
         description="Search Engine node component parameters.",

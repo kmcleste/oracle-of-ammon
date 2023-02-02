@@ -13,12 +13,12 @@ from oracle_of_ammon.api.health import get_health_status
 from oracle_of_ammon.api.models import (
     DocumentIDs,
     Documents,
-    DocumentSummary,
     HealthResponse,
     HTTPError,
     Index,
     Search,
     SearchResponse,
+    SearchSummary,
     Summary,
     UploadDelete,
 )
@@ -251,10 +251,20 @@ def delete_index(input: Index):
     path="/search-summarization",
     status_code=status.HTTP_200_OK,
     tags=["search"],
-    response_model=DocumentSummary,
+    response_model=SearchSummary,
 )
 def search_summarization(input: Search):
     return oracle.search_summarization(query=input.query, params=input.params)
+
+
+@app.post(path="/document-summarization", status_code=status.HTTP_200_OK, tags=["search"], response_model=Documents)
+def document_summarization(files: List[UploadFile] = File(..., description="List of files to be summarized.")):
+    return oracle.document_summzarization(files=files)
+
+
+@app.post(path="/search-span-summarization", status_code=status.HTTP_200_OK, tags=["search"])
+def search_span_summarization(input: Search):
+    return oracle.search_span_summarization(query=input.query, params=input.params)
 
 
 if __name__ == "__main__":
