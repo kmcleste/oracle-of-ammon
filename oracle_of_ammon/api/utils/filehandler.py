@@ -7,7 +7,7 @@ from typing import List, Union
 
 import pandas as pd
 from haystack import Document
-from haystack.nodes import PreProcessor
+from haystack.pipelines import Pipeline
 
 from oracle_of_ammon.utils.logger import configure_logger
 
@@ -28,7 +28,7 @@ class FileHandler:
     @classmethod
     def read_documents(
         cls,
-        preprocessor: PreProcessor,
+        indexing_pipeline: Pipeline,
         filepath_or_buffer: Union[SpooledTemporaryFile, str],
         filename: Union[str, None] = None,
     ) -> List[Document]:
@@ -46,23 +46,18 @@ class FileHandler:
                 path = filepath_or_buffer
 
             try:
-                with open(file=path) as f:
-                    content = f.read()
-
-                meta: dict = {
-                    "filepath_of_buffer": filepath_or_buffer,
-                    "filename": filename,
-                }
-
-                doc: Document = preprocessor.process(Document(content=content, meta=meta))
-
-                return doc
+                meta: dict = {"filepath_or_buffer": filepath_or_buffer, "filename": filename}
+                indexing_pipeline.run(file_paths=[path], meta=[meta])
+                return
 
             except Exception as e:
                 logger.error(f"Unable to read from file: {e}")
 
         except Exception as e:
             logger.error(f"Unable to read file: {e}")
+
+        finally:
+            cls.file_clean_up(path=path)
 
     @classmethod
     def read_faq(
