@@ -1,3 +1,15 @@
+## v0.3.0 (2023-02-02)
+
+### Feat
+
+- update indexing pipeline to handle new file types
+- add document summarization and search span summarization
+
+### Fix
+
+- add sudo priv to action.yml
+- add poppler-utils to runner environment
+
 ## v0.2.1 (2023-01-31)
 
 ### Fix
