@@ -64,7 +64,7 @@ See the [`data`](https://github.com/kmcleste/oracle-of-ammon/tree/main/oracle_of
 
 - ~~Semantic search~~
 - ~~Document search~~
-- Document summarization
+- ~~Document summarization~~
 - Document ranking
 - ~~Multiple index support~~
 - Annotations/Feedback
