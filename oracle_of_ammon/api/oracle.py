@@ -10,9 +10,14 @@ from haystack import Answer, Document
 from haystack.document_stores import InMemoryDocumentStore
 from haystack.nodes import (
     DocumentMerger,
+    DocxToTextConverter,
     EmbeddingRetriever,
     FARMReader,
+    FileTypeClassifier,
+    MarkdownConverter,
+    PDFToTextConverter,
     PreProcessor,
+    TextConverter,
     TransformersSummarizer,
 )
 from haystack.pipelines import (
@@ -34,16 +39,7 @@ class Oracle:
         self.index = index
         self.use_gpu: bool = False
 
-        self.preprocessor: PreProcessor = PreProcessor(
-            clean_empty_lines=True,
-            clean_whitespace=True,
-            clean_header_footer=True,
-            split_by="word",
-            split_length=200,
-            split_respect_sentence_boundary=True,
-            split_overlap=0,
-        )
-
+        self.preprocessor: PreProcessor = self.create_preprocessor()
         self.faq_document_store: InMemoryDocumentStore
         self.semantic_document_store: InMemoryDocumentStore
         (
@@ -54,12 +50,14 @@ class Oracle:
         self.faq_retriever: EmbeddingRetriever
         self.semantic_retriever: EmbeddingRetriever
         self.faq_retriever, self.semantic_retriever = self.create_retriever()
-
         self.reader: FARMReader = self.create_reader()
-
         self.summarizer: TransformersSummarizer = self.create_summarizer()
-
         self.document_merger: DocumentMerger = self.create_document_merger()
+        self.text_converter: TextConverter = self.create_text_converter()
+        self.file_type_classifier: FileTypeClassifier = self.create_file_type_classifier()
+        self.pdf_converter: PDFToTextConverter = self.create_pdf_converter()
+        self.markdown_converter: MarkdownConverter = self.create_markdown_converter()
+        self.docx_converter: DocxToTextConverter = self.create_docx_converter()
 
         self.faq_pipeline: FAQPipeline = FAQPipeline(retriever=self.faq_retriever)
         self.extractive_pipeline: ExtractiveQAPipeline = ExtractiveQAPipeline(
@@ -74,6 +72,7 @@ class Oracle:
             generate_single_summary=False,
         )
         self.span_summarizaer_pipeline: Pipeline = self.create_span_summarizer_pipeline()
+        self.indexing_pipeline: Pipeline = self.create_indexing_pipeline()
 
         self.index_documents()
 
@@ -86,7 +85,7 @@ class Oracle:
                 embedding_dim=384,
                 duplicate_documents="skip",
                 similarity="cosine",
-                progress_bar=False,
+                progress_bar=True,
             )
             semantic: InMemoryDocumentStore = InMemoryDocumentStore(
                 index=self.index,
@@ -94,7 +93,7 @@ class Oracle:
                 embedding_dim=768,
                 duplicate_documents="skip",
                 similarity="dot_product",
-                progress_bar=False,
+                progress_bar=True,
             )
             return faq, semantic
 
@@ -110,7 +109,7 @@ class Oracle:
                 document_store=self.faq_document_store,
                 use_gpu=self.use_gpu,
                 scale_score=False,
-                progress_bar=False,
+                progress_bar=True,
             )
             semantic: EmbeddingRetriever = EmbeddingRetriever(
                 embedding_model="sentence-transformers/multi-qa-mpnet-base-dot-v1",
@@ -118,7 +117,7 @@ class Oracle:
                 document_store=self.semantic_document_store,
                 use_gpu=self.use_gpu,
                 scale_score=False,
-                progress_bar=False,
+                progress_bar=True,
             )
 
             return faq, semantic
@@ -148,8 +147,7 @@ class Oracle:
                 max_length=250,
                 min_length=30,
                 use_gpu=self.use_gpu,
-                progress_bar=False,
-                generate_single_summary=False,
+                progress_bar=True,
             )
         except Exception as e:
             logger.critical(f"Unable to create summarizer: {e}")
@@ -174,6 +172,82 @@ class Oracle:
             logger.critical(f"Unable to create span summarizer pipeline: {e}")
             sys.exit(1)
 
+    def create_preprocessor(self) -> PreProcessor:
+        try:
+            return PreProcessor(
+                clean_empty_lines=True,
+                clean_whitespace=True,
+                clean_header_footer=True,
+                split_by="word",
+                split_length=200,
+                split_respect_sentence_boundary=True,
+                split_overlap=0,
+            )
+        except Exception as e:
+            logger.critical(f"Unable to create preprocessor: {e}")
+            sys.exit(1)
+
+    def create_file_type_classifier(self) -> FileTypeClassifier:
+        try:
+            return FileTypeClassifier()
+        except Exception as e:
+            logger.critical(f"Unable to create file type classifier: {e}")
+            sys.exit(1)
+
+    def create_text_converter(self) -> TextConverter:
+        try:
+            return TextConverter(remove_numeric_tables=False, valid_languages=["en"], progress_bar=True)
+        except Exception as e:
+            logger.critical(f"Unable to create text converter: {e}")
+            sys.exit(1)
+
+    def create_pdf_converter(self) -> PDFToTextConverter:
+        try:
+            return PDFToTextConverter()
+        except Exception as e:
+            logger.critical(f"Unable to create pdf text converter: {e}")
+            sys.exit(1)
+
+    def create_markdown_converter(self) -> MarkdownConverter:
+        try:
+            return MarkdownConverter()
+        except Exception as e:
+            logger.critical(f"Unable to create markdown converter: {e}")
+            sys.exit(1)
+
+    def create_docx_converter(self) -> DocxToTextConverter:
+        try:
+            return DocxToTextConverter(remove_numeric_tables=False, valid_languages=["en"], progress_bar=True)
+        except Exception as e:
+            logger.critical(f"Unable to create docx converter: {e}")
+            sys.exit(1)
+
+    def create_indexing_pipeline(self) -> Pipeline:
+        try:
+            pipeline: Pipeline = Pipeline()
+            pipeline.add_node(component=self.file_type_classifier, name="FileTypeClassifier", inputs=["File"])
+            pipeline.add_node(
+                component=self.text_converter, name="TextConverter", inputs=["FileTypeClassifier.output_1"]
+            )
+            pipeline.add_node(component=self.pdf_converter, name="PdfConverter", inputs=["FileTypeClassifier.output_2"])
+            pipeline.add_node(
+                component=self.markdown_converter, name="MarkdownConverter", inputs=["FileTypeClassifier.output_3"]
+            )
+            pipeline.add_node(
+                component=self.docx_converter, name="DocxConverter", inputs=["FileTypeClassifier.output_4"]
+            )
+            pipeline.add_node(
+                component=self.preprocessor,
+                name="PreProcessor",
+                inputs=["TextConverter", "PdfConverter", "MarkdownConverter", "DocxConverter"],
+            )
+            pipeline.add_node(component=self.semantic_document_store, name="DocumentStore", inputs=["PreProcessor"])
+
+            return pipeline
+        except Exception as e:
+            logger.critical(f"Unable to create indexing pipeline: {e}")
+            sys.exit(1)
+
     def index_documents(
         self,
         filepath_or_buffer: Union[SpooledTemporaryFile, str] = os.environ.get("OASIS_OF_SIWA", None),
@@ -188,8 +262,11 @@ class Oracle:
             if SHEET_NAME is not None and filepath_or_buffer is None:
                 logger.warning("A sheet name was provided but no excel file selected.")
 
-            if SHEET_NAME is not None:
-                SHEET_NAME = [x.strip() for x in SHEET_NAME.split(sep=",")]
+            try:
+                if SHEET_NAME is not None:
+                    SHEET_NAME = [x.strip() for x in SHEET_NAME.split(sep=",")]
+            except Exception as e:
+                logger.error(f"Unable to process xlsx sheet names: {e}")
 
             kwargs["sheet_name"] = SHEET_NAME
 
@@ -211,12 +288,9 @@ class Oracle:
                 except Exception as e:
                     logger.warning(f"Unable to write documents to document store: {e}")
         elif not kwargs.get("is_faq", is_faq) and filepath_or_buffer:
-            documents: List[Document] = FileHandler.read_documents(
-                preprocessor=self.preprocessor,
-                filepath_or_buffer=filepath_or_buffer,
-                filename=filename,
+            FileHandler.read_documents(
+                indexing_pipeline=self.indexing_pipeline, filepath_or_buffer=filepath_or_buffer, filename=filename
             )
-            self.semantic_document_store.write_documents(documents=documents, index=index, duplicate_documents="skip")
             self.semantic_document_store.update_embeddings(
                 retriever=self.semantic_retriever,
                 index=index,
