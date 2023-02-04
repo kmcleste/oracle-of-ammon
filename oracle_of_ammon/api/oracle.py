@@ -6,7 +6,7 @@ from typing import List, Union
 
 import pandas as pd
 from fastapi import UploadFile
-from haystack import Answer, Document
+from haystack import Answer
 from haystack.document_stores import InMemoryDocumentStore
 from haystack.nodes import (
     DocumentMerger,
@@ -54,7 +54,9 @@ class Oracle:
         self.summarizer: TransformersSummarizer = self.create_summarizer()
         self.document_merger: DocumentMerger = self.create_document_merger()
         self.text_converter: TextConverter = self.create_text_converter()
-        self.file_type_classifier: FileTypeClassifier = self.create_file_type_classifier()
+        self.file_type_classifier: FileTypeClassifier = (
+            self.create_file_type_classifier()
+        )
         self.pdf_converter: PDFToTextConverter = self.create_pdf_converter()
         self.markdown_converter: MarkdownConverter = self.create_markdown_converter()
         self.docx_converter: DocxToTextConverter = self.create_docx_converter()
@@ -66,13 +68,22 @@ class Oracle:
         self.document_search_pipeline: DocumentSearchPipeline = DocumentSearchPipeline(
             retriever=self.semantic_retriever
         )
-        self.search_summarization_pipeline: SearchSummarizationPipeline = SearchSummarizationPipeline(
-            summarizer=self.summarizer,
-            retriever=self.semantic_retriever,
-            generate_single_summary=False,
+        self.search_summarization_pipeline: SearchSummarizationPipeline = (
+            SearchSummarizationPipeline(
+                summarizer=self.summarizer,
+                retriever=self.semantic_retriever,
+                generate_single_summary=False,
+            )
         )
-        self.span_summarizaer_pipeline: Pipeline = self.create_span_summarizer_pipeline()
-        self.indexing_pipeline: Pipeline = self.create_indexing_pipeline()
+        self.span_summarizaer_pipeline: Pipeline = (
+            self.create_span_summarizer_pipeline()
+        )
+        self.indexing_pipeline: Pipeline = self.create_document_pipeline()
+        self.indexing_pipeline = self.indexing_pipeline.add_node(
+            component=self.semantic_document_store,
+            name="DocumentStore",
+            inputs=["PreProcessor"],
+        )
 
         self.index_documents()
 
@@ -163,9 +174,17 @@ class Oracle:
     def create_span_summarizer_pipeline(self) -> Pipeline:
         try:
             pipeline: Pipeline = Pipeline()
-            pipeline.add_node(component=self.semantic_retriever, name="Retriever", inputs=["Query"])
-            pipeline.add_node(component=self.document_merger, name="DocumentMerger", inputs=["Retriever"])
-            pipeline.add_node(component=self.summarizer, name="Summarizer", inputs=["DocumentMerger"])
+            pipeline.add_node(
+                component=self.semantic_retriever, name="Retriever", inputs=["Query"]
+            )
+            pipeline.add_node(
+                component=self.document_merger,
+                name="DocumentMerger",
+                inputs=["Retriever"],
+            )
+            pipeline.add_node(
+                component=self.summarizer, name="Summarizer", inputs=["DocumentMerger"]
+            )
 
             return pipeline
         except Exception as e:
@@ -196,7 +215,9 @@ class Oracle:
 
     def create_text_converter(self) -> TextConverter:
         try:
-            return TextConverter(remove_numeric_tables=False, valid_languages=["en"], progress_bar=True)
+            return TextConverter(
+                remove_numeric_tables=False, valid_languages=["en"], progress_bar=True
+            )
         except Exception as e:
             logger.critical(f"Unable to create text converter: {e}")
             sys.exit(1)
@@ -217,31 +238,51 @@ class Oracle:
 
     def create_docx_converter(self) -> DocxToTextConverter:
         try:
-            return DocxToTextConverter(remove_numeric_tables=False, valid_languages=["en"], progress_bar=True)
+            return DocxToTextConverter(
+                remove_numeric_tables=False, valid_languages=["en"], progress_bar=True
+            )
         except Exception as e:
             logger.critical(f"Unable to create docx converter: {e}")
             sys.exit(1)
 
-    def create_indexing_pipeline(self) -> Pipeline:
+    def create_document_pipeline(self) -> Pipeline:
         try:
             pipeline: Pipeline = Pipeline()
-            pipeline.add_node(component=self.file_type_classifier, name="FileTypeClassifier", inputs=["File"])
             pipeline.add_node(
-                component=self.text_converter, name="TextConverter", inputs=["FileTypeClassifier.output_1"]
-            )
-            pipeline.add_node(component=self.pdf_converter, name="PdfConverter", inputs=["FileTypeClassifier.output_2"])
-            pipeline.add_node(
-                component=self.markdown_converter, name="MarkdownConverter", inputs=["FileTypeClassifier.output_3"]
+                component=self.file_type_classifier,
+                name="FileTypeClassifier",
+                inputs=["File"],
             )
             pipeline.add_node(
-                component=self.docx_converter, name="DocxConverter", inputs=["FileTypeClassifier.output_4"]
+                component=self.text_converter,
+                name="TextConverter",
+                inputs=["FileTypeClassifier.output_1"],
+            )
+            pipeline.add_node(
+                component=self.pdf_converter,
+                name="PdfConverter",
+                inputs=["FileTypeClassifier.output_2"],
+            )
+            pipeline.add_node(
+                component=self.markdown_converter,
+                name="MarkdownConverter",
+                inputs=["FileTypeClassifier.output_3"],
+            )
+            pipeline.add_node(
+                component=self.docx_converter,
+                name="DocxConverter",
+                inputs=["FileTypeClassifier.output_4"],
             )
             pipeline.add_node(
                 component=self.preprocessor,
                 name="PreProcessor",
-                inputs=["TextConverter", "PdfConverter", "MarkdownConverter", "DocxConverter"],
+                inputs=[
+                    "TextConverter",
+                    "PdfConverter",
+                    "MarkdownConverter",
+                    "DocxConverter",
+                ],
             )
-            pipeline.add_node(component=self.semantic_document_store, name="DocumentStore", inputs=["PreProcessor"])
 
             return pipeline
         except Exception as e:
@@ -250,14 +291,18 @@ class Oracle:
 
     def index_documents(
         self,
-        filepath_or_buffer: Union[SpooledTemporaryFile, str] = os.environ.get("OASIS_OF_SIWA", None),
+        filepath_or_buffer: Union[SpooledTemporaryFile, str] = os.environ.get(
+            "OASIS_OF_SIWA", None
+        ),
         filename: Union[str, None] = None,
         index: str = os.environ.get("INDEX", "document"),
         **kwargs,
     ) -> None:
         is_faq = os.environ.get("IS_FAQ") == "True"
         if kwargs.get("is_faq", is_faq) and filepath_or_buffer:
-            SHEET_NAME: str = kwargs.get("sheet_name", os.environ.get("SHEET_NAME", None))
+            SHEET_NAME: str = kwargs.get(
+                "sheet_name", os.environ.get("SHEET_NAME", None)
+            )
 
             if SHEET_NAME is not None and filepath_or_buffer is None:
                 logger.warning("A sheet name was provided but no excel file selected.")
@@ -278,19 +323,28 @@ class Oracle:
                 logger.debug("Indexing documents...")
 
                 questions = list(df["question"].values)
-                df["question_emb"] = self.faq_retriever.embed_queries(queries=questions).tolist()
+                df["question_emb"] = self.faq_retriever.embed_queries(
+                    queries=questions
+                ).tolist()
                 df = df.rename(columns={"question": "content"})
 
                 try:
                     docs_to_index = df.to_dict(orient="records")
-                    self.faq_document_store.write_documents(docs_to_index, duplicate_documents="skip", index=index)
+                    self.faq_document_store.write_documents(
+                        docs_to_index, duplicate_documents="skip", index=index
+                    )
 
                 except Exception as e:
                     logger.warning(f"Unable to write documents to document store: {e}")
         elif not kwargs.get("is_faq", is_faq) and filepath_or_buffer:
-            FileHandler.read_documents(
-                indexing_pipeline=self.indexing_pipeline, filepath_or_buffer=filepath_or_buffer, filename=filename
+            path, meta = FileHandler.read_documents(
+                filepath_or_buffer=filepath_or_buffer,
+                filename=filename,
             )
+            self.indexing_pipeline.run(file_paths=[path], meta=[meta])
+
+            FileHandler.file_clean_up(path=path)
+
             self.semantic_document_store.update_embeddings(
                 retriever=self.semantic_retriever,
                 index=index,
@@ -327,7 +381,9 @@ class Oracle:
     def faq_search(
         self,
         query: str,
-        params: dict = {"Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}},
+        params: dict = {
+            "Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}
+        },
     ) -> Answer:
         try:
             return self.faq_pipeline.run(query=query, params=params, debug=False)
@@ -350,42 +406,64 @@ class Oracle:
     def document_search(
         self,
         query: str,
-        params: dict = {"Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}},
+        params: dict = {
+            "Retriever": {"top_k": 3, "index": os.environ.get("INDEX", "document")}
+        },
     ) -> Answer:
         try:
-            return self.document_search_pipeline.run(query=query, params=params, debug=False)
+            return self.document_search_pipeline.run(
+                query=query, params=params, debug=False
+            )
         except Exception as e:
             logger.error(f"Unable to perform query: {e}")
 
     def search_summarization(
         self,
         query: str,
-        params: dict = {"Retriever": {"tok_k": 5, "index": os.environ.get("INDEX", "document")}},
+        params: dict = {
+            "Retriever": {"tok_k": 5, "index": os.environ.get("INDEX", "document")}
+        },
     ):
         try:
-            return self.search_summarization_pipeline.run(query=query, params=params, debug=False)
+            return self.search_summarization_pipeline.run(
+                query=query, params=params, debug=False
+            )
         except Exception as e:
             logger.error(f"Unable to perform query: {e}")
-
-    def document_summzarization(self, files: List[UploadFile]) -> dict:
-        resp: list = []
-        for file in files:
-            try:
-                doc = FileHandler.read_documents(
-                    preprocessor=self.preprocessor, filepath_or_buffer=file.file, filename=file.filename
-                )
-                summary = self.summarizer.predict(documents=doc, generate_single_summary=False)
-                resp.append(summary)
-            except Exception as e:
-                logger.error(f"Unable to summarize {file.filename}: {e}")
-        flat_resp: List[Document] = [item for sublist in resp for item in sublist]
-
-        return {"documents": flat_resp}
 
     def search_span_summarization(
-        self, query: str, params: dict = {"Retriever": {"top_k": 5, "index": os.environ.get("INDEX", "document")}}
+        self,
+        query: str,
+        params: dict = {
+            "Retriever": {"top_k": 5, "index": os.environ.get("INDEX", "document")}
+        },
     ):
         try:
-            return self.span_summarizaer_pipeline.run(query=query, params=params, debug=False)
+            return self.span_summarizaer_pipeline.run(
+                query=query, params=params, debug=False
+            )
         except Exception as e:
             logger.error(f"Unable to perform query: {e}")
+
+    def document_summzarization(self, file: UploadFile) -> dict:
+        try:
+            path, meta = FileHandler.read_documents(
+                filepath_or_buffer=file.file, filename=file.filename
+            )
+            pipeline = self.create_document_pipeline()
+            pipeline.add_node(
+                component=self.document_merger,
+                name="DocumentMerger",
+                inputs=["PreProcessor"],
+            )
+            pipeline.add_node(
+                component=self.summarizer, name="Summarizer", inputs=["DocumentMerger"]
+            )
+            return pipeline.run(file_paths=[path], meta=[meta])
+
+        except Exception as exc:
+            logger.error(f"Unable to upload {file.filename}: {exc}")
+            return {"message": f"Unable to upload {file.filename}"}
+
+        finally:
+            file.file.close()

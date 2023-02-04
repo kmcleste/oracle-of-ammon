@@ -81,7 +81,7 @@ version_files = ["pyproject.toml:version", "oracle_of_ammon/__version__.py"]
 update_changelog_on_bump = true
 
 [tool.black]
-line-length = 120
+line-length = 88
 target-version = ["py38", "py39", "py310"]
 include = '\.pyi?'
 

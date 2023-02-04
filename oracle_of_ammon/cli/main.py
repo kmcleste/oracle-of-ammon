@@ -22,13 +22,19 @@ app = typer.Typer(help=description)
 
 @app.command()
 def summon(
-    path: Union[str, None] = typer.Option(default=None, help="Filepath of file used to pre-index document store."),
+    path: Union[str, None] = typer.Option(
+        default=None, help="Filepath of file used to pre-index document store."
+    ),
     sheet_name: Union[str, None] = typer.Option(
         default=None,
         help="If using an excel file, select which sheet(s) to load. If none provided, all sheets will be loaded. Expects a comma-separated list.",
     ),
-    title: Union[str, None] = typer.Option(default=None, help="API documentation title."),
-    index: Union[str, None] = typer.Option(default=None, help="Default index name to upload documents to."),
+    title: Union[str, None] = typer.Option(
+        default=None, help="API documentation title."
+    ),
+    index: Union[str, None] = typer.Option(
+        default=None, help="Default index name to upload documents to."
+    ),
     faq: Union[bool, None] = typer.Option(
         default=True, help="Designation for content preloaded into the document store."
     ),

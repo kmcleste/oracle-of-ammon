@@ -29,13 +29,17 @@ def test_health():
 
 
 def test_summary_empty_docstore():
-    response: Response = client.post("/summary", json={"index": "document", "is_faq": False})
+    response: Response = client.post(
+        "/summary", json={"index": "document", "is_faq": False}
+    )
     assert response.status_code == 404
     assert parse_obj_as(HTTPError, response.json())
 
 
 def test_faq_upload():
-    file = open(file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "faq.json"), mode="br")
+    file = open(
+        file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "faq.json"), mode="br"
+    )
     response: Response = client.post(
         "/upload-documents",
         files={"files": file},
@@ -60,19 +64,25 @@ def test_semantic_upload():
 
 
 def test_get_faq():
-    response: Response = client.post("/get-documents", json={"index": "document", "is_faq": True})
+    response: Response = client.post(
+        "/get-documents", json={"index": "document", "is_faq": True}
+    )
     assert response.status_code == 200
     assert parse_obj_as(Documents, response.json())
 
 
 def test_get_documents():
-    response: Response = client.post("/get-documents", json={"index": "document", "is_faq": False})
+    response: Response = client.post(
+        "/get-documents", json={"index": "document", "is_faq": False}
+    )
     assert response.status_code == 200
     assert parse_obj_as(Documents, response.json())
 
 
 def test_semantic_summary():
-    response: Response = client.post("/summary", json={"index": "document", "is_faq": False})
+    response: Response = client.post(
+        "/summary", json={"index": "document", "is_faq": False}
+    )
     assert response.status_code == 200
     assert parse_obj_as(Summary, response.json())
 
