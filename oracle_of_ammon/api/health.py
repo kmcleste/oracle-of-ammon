@@ -36,7 +36,9 @@ def get_health_status():
                 usage=GPUUsage(
                     memory_total=round(gpu_mem_total),
                     kernel_usage=pynvml.nvmlDeviceGetUtilizationRates(handle).gpu,
-                    memory_used=round(gpu_mem_used) if gpu_mem_used is not None else None,
+                    memory_used=round(gpu_mem_used)
+                    if gpu_mem_used is not None
+                    else None,
                 ),
             )
 

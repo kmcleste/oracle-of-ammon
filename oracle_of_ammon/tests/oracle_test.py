@@ -23,7 +23,9 @@ def test_index_faq():
 
 
 def test_index_documents():
-    path = pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "semantic.txt").as_posix()
+    path = pathlib.Path(
+        os.getcwd(), "oracle_of_ammon", "data", "semantic.txt"
+    ).as_posix()
     oracle.index_documents(filepath_or_buffer=path, **{"is_faq": False})
     assert oracle.semantic_document_store.get_document_count() != 0
 
