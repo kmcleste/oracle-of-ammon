@@ -107,6 +107,7 @@ async def root():
     response_model=SearchResponse,
 )
 def faq_search(input: Search):
+    """Perform FAQ information retrieval. System expects full sentence questions."""
     return oracle.faq_search(query=input.query, params=input.params)
 
 
@@ -114,8 +115,10 @@ def faq_search(input: Search):
     path="/extractive-search",
     status_code=status.HTTP_200_OK,
     tags=["search"],
+    response_model=SearchResponse,
 )
 def extractive_search(input: Search):
+    """Perform extractive, semantic search. System expects full sentence questions."""
     return oracle.extractive_search(query=input.query, params=input.params)
 
 
@@ -126,6 +129,7 @@ def extractive_search(input: Search):
     response_model=Documents,
 )
 def document_search(input: Search):
+    """Returns full documents related to user query."""
     return oracle.document_search(query=input.query, params=input.params)
 
 
@@ -136,6 +140,7 @@ def document_search(input: Search):
     response_model=HealthResponse,
 )
 def health():
+    """Health check returns CPU, Memory, and GPU information."""
     return get_health_status()
 
 
@@ -146,6 +151,7 @@ def health():
     response_model=Documents,
 )
 def get_documents(input: Index):
+    """Returns all documents in the selected index/document store."""
     if input.is_faq:
         return {
             "documents": oracle.faq_document_store.get_all_documents(
@@ -181,6 +187,7 @@ def upload_documents(
         description="Which document store to access.",
     ),
 ):
+    """Handles document upload for both FAQ and Semantic document stores. Use the `is_faq` parameter to tell the engine which type of document store to use."""
     return oracle.upload_documents(
         files=files, index=index, **{"sheet_name": sheet_name, "is_faq": is_faq}
     )
@@ -199,6 +206,7 @@ def upload_documents(
     },
 )
 def summary(input: Index):
+    """Returns basic summary statistics for a given index."""
     if input.is_faq:
         if input.index not in oracle.faq_document_store.indexes.keys():
             raise HTTPException(
@@ -220,6 +228,7 @@ def summary(input: Index):
     response_model=UploadDelete,
 )
 def delete_documents(input: DocumentIDs):
+    """Deletes selected documents from an index. Expects comma-separated list of document id's."""
     if input.is_faq:
         oracle.faq_document_store.delete_documents(index=input.index, ids=input.ids)
         oracle.faq_document_store.update_embeddings(
@@ -251,6 +260,7 @@ def delete_documents(input: DocumentIDs):
     },
 )
 def delete_index(input: Index):
+    """Deletes entire index."""
     if input.is_faq:
         if input.index not in oracle.faq_document_store.indexes.keys():
             raise HTTPException(
@@ -274,6 +284,7 @@ def delete_index(input: Index):
     response_model=SearchSummary,
 )
 def search_summarization(input: Search):
+    """Extends document search. Finds the most relevant documents and then returns a summary for each one."""
     return oracle.search_summarization(query=input.query, params=input.params)
 
 
@@ -286,6 +297,7 @@ def search_summarization(input: Search):
 def document_summarization(
     file: UploadFile = File(..., description="File to be summarized.")
 ):
+    """Skips indexing and returns a document summary."""
     return oracle.document_summzarization(file=file)
 
 
@@ -293,6 +305,7 @@ def document_summarization(
     path="/search-span-summarization", status_code=status.HTTP_200_OK, tags=["search"]
 )
 def search_span_summarization(input: Search):
+    """Extends document search. Finds the most relevant documents and returns a single, combined summary."""
     return oracle.search_span_summarization(query=input.query, params=input.params)
 
 
