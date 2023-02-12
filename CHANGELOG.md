@@ -1,3 +1,9 @@
+## v0.3.1 (2023-02-11)
+
+### Fix
+
+- non-indexed document summarization
+
 ## v0.3.0 (2023-02-02)
 
 ### Feat
