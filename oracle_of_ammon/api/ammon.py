@@ -187,7 +187,6 @@ def upload_documents(
         description="Which document store to access.",
     ),
 ):
-    """Handles document upload for both FAQ and Semantic document stores. Use the `is_faq` parameter to tell the engine which type of document store to use."""
     return oracle.upload_documents(
         files=files, index=index, **{"sheet_name": sheet_name, "is_faq": is_faq}
     )
@@ -298,11 +297,14 @@ def document_summarization(
     file: UploadFile = File(..., description="File to be summarized.")
 ):
     """Skips indexing and returns a document summary."""
-    return oracle.document_summzarization(file=file)
+    return oracle.document_summarization(file=file)
 
 
 @app.post(
-    path="/search-span-summarization", status_code=status.HTTP_200_OK, tags=["search"]
+    path="/search-span-summarization",
+    status_code=status.HTTP_200_OK,
+    tags=["search"],
+    response_model=Documents,
 )
 def search_span_summarization(input: Search):
     """Extends document search. Finds the most relevant documents and returns a single, combined summary."""

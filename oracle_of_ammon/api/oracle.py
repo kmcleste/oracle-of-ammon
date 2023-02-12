@@ -75,15 +75,8 @@ class Oracle:
                 generate_single_summary=False,
             )
         )
-        self.span_summarizaer_pipeline: Pipeline = (
-            self.create_span_summarizer_pipeline()
-        )
-        self.indexing_pipeline: Pipeline = self.create_document_pipeline()
-        self.indexing_pipeline = self.indexing_pipeline.add_node(
-            component=self.semantic_document_store,
-            name="DocumentStore",
-            inputs=["PreProcessor"],
-        )
+        self.span_summarizer_pipeline: Pipeline = self.create_span_summarizer_pipeline()
+        self.indexing_pipeline: Pipeline = self.create_indexing_pipeline()
 
         self.index_documents()
 
@@ -215,9 +208,7 @@ class Oracle:
 
     def create_text_converter(self) -> TextConverter:
         try:
-            return TextConverter(
-                remove_numeric_tables=False, valid_languages=["en"], progress_bar=True
-            )
+            return TextConverter(remove_numeric_tables=False, progress_bar=True)
         except Exception as e:
             logger.critical(f"Unable to create text converter: {e}")
             sys.exit(1)
@@ -245,7 +236,8 @@ class Oracle:
             logger.critical(f"Unable to create docx converter: {e}")
             sys.exit(1)
 
-    def create_document_pipeline(self) -> Pipeline:
+    def create_base_document_pipeline(self) -> Pipeline:
+        """Reusable function to create document handling pipelines."""
         try:
             pipeline: Pipeline = Pipeline()
             pipeline.add_node(
@@ -282,6 +274,35 @@ class Oracle:
                     "MarkdownConverter",
                     "DocxConverter",
                 ],
+            )
+            return pipeline
+        except Exception as e:
+            logger.critical(f"Unable to create base document pipeline: {e}")
+            sys.exit(1)
+
+    def create_indexing_pipeline(self) -> Pipeline:
+        try:
+            pipeline: Pipeline = self.create_base_document_pipeline()
+            pipeline.add_node(
+                component=self.semantic_document_store,
+                name="DocumentStore",
+                inputs=["PreProcessor"],
+            )
+            return pipeline
+        except Exception as e:
+            logger.critical(f"Unable to create indexing pipeline: {e}")
+            sys.exit(1)
+
+    def create_summarization_pipeline(self) -> Pipeline:
+        try:
+            pipeline: Pipeline = self.create_base_document_pipeline()
+            pipeline.add_node(
+                component=self.document_merger,
+                name="DocumentMerger",
+                inputs=["PreProcessor"],
+            )
+            pipeline.add_node(
+                component=self.summarizer, name="Summarizer", inputs=["DocumentMerger"]
             )
 
             return pipeline
@@ -350,8 +371,6 @@ class Oracle:
                 index=index,
                 update_existing_embeddings=False,
             )
-        else:
-            return
 
     def upload_documents(
         self,
@@ -421,7 +440,7 @@ class Oracle:
         self,
         query: str,
         params: dict = {
-            "Retriever": {"tok_k": 5, "index": os.environ.get("INDEX", "document")}
+            "Retriever": {"top_k": 5, "index": os.environ.get("INDEX", "document")}
         },
     ):
         try:
@@ -439,26 +458,19 @@ class Oracle:
         },
     ):
         try:
-            return self.span_summarizaer_pipeline.run(
+            return self.span_summarizer_pipeline.run(
                 query=query, params=params, debug=False
             )
         except Exception as e:
             logger.error(f"Unable to perform query: {e}")
 
-    def document_summzarization(self, file: UploadFile) -> dict:
+    def document_summarization(self, file: UploadFile) -> dict:
         try:
             path, meta = FileHandler.read_documents(
                 filepath_or_buffer=file.file, filename=file.filename
             )
-            pipeline = self.create_document_pipeline()
-            pipeline.add_node(
-                component=self.document_merger,
-                name="DocumentMerger",
-                inputs=["PreProcessor"],
-            )
-            pipeline.add_node(
-                component=self.summarizer, name="Summarizer", inputs=["DocumentMerger"]
-            )
+            pipeline = self.create_summarization_pipeline()
+
             return pipeline.run(file_paths=[path], meta=[meta])
 
         except Exception as exc:

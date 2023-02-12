@@ -1,3 +1,4 @@
+import logging
 import os
 import pathlib
 
@@ -11,8 +12,12 @@ from oracle_of_ammon.api.models import (
     HealthResponse,
     HTTPError,
     SearchResponse,
+    SearchSummary,
     Summary,
 )
+from oracle_of_ammon.utils.logger import configure_logger
+
+logger: logging.Logger = configure_logger()
 
 client = TestClient(app)
 
@@ -38,7 +43,7 @@ def test_summary_empty_docstore():
 
 def test_faq_upload():
     file = open(
-        file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "faq.json"), mode="br"
+        file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "faq.csv"), mode="br"
     )
     response: Response = client.post(
         "/upload-documents",
@@ -117,6 +122,45 @@ def test_document_search():
         json={
             "query": "Location of Ammon",
             "params": {"Retriever": {"top_k": 3}},
+        },
+    )
+    assert response.status_code == 200
+    assert parse_obj_as(Documents, response.json())
+
+
+def test_search_summarization():
+    response: Response = client.post(
+        "/search-summarization",
+        json={
+            "query": "What is the climate of Siwa?",
+            "params": {"Retriever": {"top_k": 3, "index": "document"}},
+        },
+    )
+    assert response.status_code == 200
+    assert parse_obj_as(SearchSummary, response.json())
+
+
+def test_document_summarization():
+    file = open(
+        file=pathlib.Path(os.getcwd(), "oracle_of_ammon", "data", "semantic.txt"),
+        mode="br",
+    )
+
+    response: Response = client.post(
+        "/document-summarization",
+        files={"file": file},
+    )
+    assert response.status_code == 200
+    assert parse_obj_as(Documents, response.json())
+    file.close()
+
+
+def test_search_span_summarization():
+    response: Response = client.post(
+        "/search-span-summarization",
+        json={
+            "query": "What is the climate of Siwa?",
+            "params": {"Retriever": {"top_k": 3, "index": "document"}},
         },
     )
     assert response.status_code == 200
