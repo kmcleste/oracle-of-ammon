@@ -39,6 +39,7 @@ python-magic = "^0.4.27"
 pytesseract = "^0.3.10"
 bs4 = "^0.0.1"
 markdown = ">=3.2.1,<3.4"
+locust = "^2.14.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -51,7 +52,6 @@ ipykernel = "^6.19.4"
 ipywidgets = "^8.0.4"
 httpx = "^0.23.1"
 bandit = {extras = ["toml"], version = "^1.7.4"}
-locust = "^2.14.0"
 mkdocs = "^1.4.2"
 mkdocs-material = "^9.0.6"
 mkdocstrings = "^0.20.0"
