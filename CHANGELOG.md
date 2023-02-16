@@ -1,3 +1,9 @@
+## v0.3.2 (2023-02-15)
+
+### Fix
+
+- move locust from dev to main dependency
+
 ## v0.3.1 (2023-02-11)
 
 ### Fix

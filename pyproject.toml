@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oracle-of-ammon"
-version = "0.3.1"
+version = "0.3.2"
 description = "CLI tool for creating Search APIs."
 authors = ["Kyle McLester <kyle.mclester@gmail.com>"]
 license = "MIT"
@@ -75,7 +75,7 @@ filterwarnings = [
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.3.1"
+version = "0.3.2"
 tag_format = "v$version"
 version_files = ["pyproject.toml:version", "oracle_of_ammon/__version__.py"]
 update_changelog_on_bump = true
