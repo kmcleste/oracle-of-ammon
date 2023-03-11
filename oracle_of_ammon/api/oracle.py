@@ -27,6 +27,7 @@ from haystack.pipelines import (
     Pipeline,
     SearchSummarizationPipeline,
 )
+from torch.cuda import is_available
 
 from oracle_of_ammon.api.utils.filehandler import FileHandler
 from oracle_of_ammon.utils.logger import configure_logger
@@ -37,7 +38,9 @@ logger: logging.Logger = configure_logger()
 class Oracle:
     def __init__(self, index: str = os.environ.get("INDEX", "document")):
         self.index = index
-        self.use_gpu: bool = False
+        self.use_gpu: bool = is_available()
+        if not self.use_gpu:
+            logger.debug("No CUDA-compatible GPU found.")
 
         self.preprocessor: PreProcessor = self.create_preprocessor()
         self.faq_document_store: InMemoryDocumentStore
