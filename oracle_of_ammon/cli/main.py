@@ -23,7 +23,7 @@ app = typer.Typer(help=description)
 @app.command()
 def summon(
     path: Union[str, None] = typer.Option(
-        default=None, help="Filepath of file used to pre-index document store."
+        default=None, help="Path of file used to pre-index document store."
     ),
     sheet_name: Union[str, None] = typer.Option(
         default=None,
@@ -32,9 +32,7 @@ def summon(
     title: Union[str, None] = typer.Option(
         default=None, help="API documentation title."
     ),
-    index: Union[str, None] = typer.Option(
-        default=None, help="Default index name to upload documents to."
-    ),
+    index: Union[str, None] = typer.Option(default=None, help="Default index name."),
     faq: Union[bool, None] = typer.Option(
         default=True, help="Designation for content preloaded into the document store."
     ),
@@ -79,3 +77,33 @@ def locust() -> None:
         env=os.environ,
         shell=False,
     )
+
+
+@app.command()
+def stream(
+    api_url: Union[str, None] = typer.Option(
+        default="http://127.0.0.1", help="URL of REST API."
+    ),
+    api_port: Union[str, None] = typer.Option(default="8000", help="Port of REST API."),
+    port: Union[str, None] = typer.Option(default="8501", help="Port of Streamlit UI."),
+) -> None:
+    """
+    Test out your search engine through the Streamlit Web UI. Default port: 8501
+    """
+    if api_url is not None:
+        os.environ["API_URL"] = api_url
+    if api_port is not None:
+        os.environ["API_PORT"] = api_port
+
+    proc_cmd: list = ["streamlit", "run", "oracle_of_ammon/ui/01_🏠_Home.py"]
+
+    if port is not None:
+        proc_cmd: list = [
+            "streamlit",
+            "run",
+            "oracle_of_ammon/ui/01_🏠_Home.py",
+            "--server.port",
+            port,
+        ]
+
+    subprocess.call(proc_cmd, env=os.environ, shell=False)
